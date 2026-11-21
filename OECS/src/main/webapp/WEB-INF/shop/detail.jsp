@@ -1,0 +1,2122 @@
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@taglib prefix="fn" uri="jakarta.tags.functions"%>
+<%@include file="/WEB-INF/include/header.jsp"%>
+
+<style>
+    .detail-page {
+        background: #fff;
+        min-height: 100vh;
+        padding: 30px 0 60px;
+    }
+
+    .detail-breadcrumb {
+        font-size: 14px;
+    }
+
+    .detail-breadcrumb a {
+        color: #667085;
+        text-decoration: none;
+    }
+
+    .detail-breadcrumb a:hover {
+        color: #0d6efd;
+    }
+
+    .detail-gallery {
+        position: sticky;
+        top: 100px;
+    }
+
+    .gallery-main {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #f8fafc;
+        border: 1px solid #edf0f4;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .gallery-main img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 16px;
+    }
+
+    .gallery-placeholder-icon {
+        font-size: 90px;
+        color: #cbd5e1;
+    }
+
+    .gallery-count {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        background: rgba(15, 23, 42, 0.75);
+        color: #fff;
+        border-radius: 30px;
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    .gallery-thumbnails {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 12px 2px;
+        scrollbar-width: thin;
+    }
+
+    .gallery-thumb-button {
+        width: 78px;
+        height: 78px;
+        flex-shrink: 0;
+        border: 2px solid #e5e7eb;
+        background: #fff;
+        border-radius: 12px;
+        padding: 5px;
+        cursor: pointer;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .gallery-thumb-button:hover {
+        border-color: #93c5fd;
+    }
+
+    .gallery-thumb-button.active {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, .08);
+    }
+
+    .gallery-thumb-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .product-title {
+        font-size: clamp(24px, 3vw, 32px);
+        font-weight: 800;
+        line-height: 1.3;
+        color: #142b4a;
+    }
+
+    .product-subtitle {
+        color: #667085;
+        font-size: 14px;
+    }
+
+    .product-price-panel {
+        background: #f8fafc;
+        border: 1px solid #e8edf4;
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .product-price-display {
+        font-size: clamp(28px, 3.5vw, 38px);
+        font-weight: 800;
+        color: #e53935;
+        line-height: 1.2;
+    }
+
+    .product-original-price {
+        font-size: 17px;
+        color: #94a3b8;
+        text-decoration: line-through;
+    }
+
+    .product-discount {
+        color: #dc2626;
+        background: #fee2e2;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sku-radio {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+    }
+
+    .sku-label {
+        display: block;
+        width: 100%;
+        min-height: 88px;
+        padding: 13px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        cursor: pointer;
+        background: #fff;
+        transition: border-color .2s, background .2s;
+    }
+
+    .sku-label:hover {
+        border-color: #93c5fd;
+    }
+
+    .sku-radio:checked + .sku-label {
+        border-color: #0d6efd;
+        background: #eff6ff;
+    }
+
+    .sku-radio:focus-visible + .sku-label {
+        outline: 3px solid rgba(13, 110, 253, .35);
+        outline-offset: 2px;
+    }
+
+    .sku-radio:disabled + .sku-label {
+        opacity: .5;
+        background: #f8fafc;
+        cursor: not-allowed;
+    }
+
+    .sku-label-name {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 5px;
+        overflow-wrap: anywhere;
+    }
+
+    .sku-label-price {
+        display: block;
+        font-size: 13px;
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .sku-label-stock {
+        display: block;
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .purchase-button {
+        min-height: 54px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .detail-section-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #142b4a;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #edf0f4;
+        margin-bottom: 24px;
+    }
+
+    .specs-table th {
+        width: 38%;
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .specs-table td {
+        color: #1e293b;
+        overflow-wrap: anywhere;
+    }
+
+    .specs-table th,
+    .specs-table td {
+        padding: 14px 16px;
+    }
+
+    .description-container {
+        position: relative;
+    }
+
+    .product-description-content {
+        white-space: pre-line;
+        line-height: 1.8;
+        color: #334155;
+        overflow: hidden;
+    }
+
+    .product-description-content.collapsed {
+        max-height: 250px;
+    }
+
+    .description-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 1)
+            );
+        pointer-events: none;
+    }
+
+    .description-overlay.hidden {
+        display: none;
+    }
+
+    .review-card {
+        border: 1px solid #e9edf3;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 16px;
+    }
+
+    .review-image {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    @media (max-width: 991.98px) {
+        .detail-gallery {
+            position: static;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .sku-label {
+            min-height: 78px;
+            padding: 10px;
+        }
+
+        .gallery-thumb-button {
+            width: 65px;
+            height: 65px;
+        }
+
+        .product-price-panel {
+            padding: 18px;
+        }
+    }
+</style>
+
+<div class="detail-page">
+    <div class="container">
+
+        <!-- ======================================== -->
+        <!-- 1. BREADCRUMB                          -->
+        <!-- ======================================== -->
+
+        <nav aria-label="breadcrumb"
+             class="detail-breadcrumb mb-4">
+
+            <ol class="breadcrumb">
+
+                <li class="breadcrumb-item">
+                    <a href="${pageContext.request.contextPath}/shop">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li class="breadcrumb-item">
+                    <a href="${pageContext.request.contextPath}/shop?categoryId=${product.categoryId}">
+                        <c:out value="${product.category.categoryName}"/>
+                    </a>
+                </li>
+
+                <li class="breadcrumb-item active"
+                    aria-current="page">
+
+                    <c:out value="${product.productName}"/>
+                </li>
+
+            </ol>
+        </nav>
+
+        <!-- ======================================== -->
+        <!-- 2. THÔNG TIN SẢN PHẨM                   -->
+        <!-- ======================================== -->
+
+        <div class="row g-4 g-lg-5 mb-5">
+
+            <!-- ==================================== -->
+            <!-- 2.1. THƯ VIỆN ẢNH                  -->
+            <!-- ==================================== -->
+
+            <div class="col-lg-5">
+
+                <div class="detail-gallery">
+
+                    <div class="gallery-main mb-2">
+
+                        <img id="mainProductImage"
+                             src=""
+                             alt="Ảnh sản phẩm"
+                             style="display:none;">
+
+                        <i id="galleryPlaceholder"
+                           class="bi bi-image gallery-placeholder-icon"></i>
+
+                        <span id="galleryCount"
+                              class="gallery-count"
+                              style="display:none;"></span>
+
+                    </div>
+
+                    <div id="galleryThumbnails"
+                         class="gallery-thumbnails"
+                         aria-label="Danh sách ảnh sản phẩm">
+                    </div>
+
+                    <p id="gallerySourceLabel"
+                       class="small text-muted mb-0">
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- ==================================== -->
+            <!-- 2.2. THÔNG TIN VÀ MUA HÀNG         -->
+            <!-- ==================================== -->
+
+            <div class="col-lg-7">
+
+                <div class="mb-3">
+
+                    <span class="badge bg-primary-subtle
+                          text-primary rounded-pill
+                          px-3 py-2">
+
+                        <i class="bi bi-patch-check-fill me-1"></i>
+                        <c:out value="${product.brand.brandName}"/>
+                    </span>
+
+                    <c:if test="${not empty product.modelCode}">
+
+                        <span class="badge bg-light text-secondary
+                              border rounded-pill px-3 py-2 ms-1">
+
+                            Model:
+                            <c:out value="${product.modelCode}"/>
+                        </span>
+
+                    </c:if>
+                </div>
+
+                <h1 class="product-title mb-3">
+                    <c:out value="${product.productName}"/>
+                </h1>
+
+                <div class="d-flex flex-wrap align-items-center
+                     gap-3 product-subtitle mb-4">
+
+                    <span>
+                        <i class="bi bi-tag me-1"></i>
+                        <c:out value="${product.category.categoryName}"/>
+                    </span>
+
+                    <span>
+                        <i class="bi bi-star-fill text-warning me-1"></i>
+
+                        <c:choose>
+                            <c:when test="${totalReviews > 0}">
+
+                                <strong>
+                                    <fmt:formatNumber
+                                        value="${averageRating}"
+                                        minFractionDigits="1"
+                                        maxFractionDigits="1"/>
+                                </strong>
+
+                                (${totalReviews} đánh giá)
+
+                            </c:when>
+
+                            <c:otherwise>
+                                Chưa có đánh giá
+                            </c:otherwise>
+                        </c:choose>
+                    </span>
+
+                    <span>
+                        <i class="bi bi-bag-check me-1"></i>
+                        <fmt:formatNumber value="${purchaseCount}"
+                                          pattern="#,##0"/>
+                        lượt mua
+                    </span>
+
+                </div>
+
+                <!-- ================================ -->
+                <!-- GIÁ VÀ TỒN KHO                 -->
+                <!-- ================================ -->
+
+                <div class="product-price-panel mb-4">
+
+                    <div class="small text-muted mb-2">
+                        Giá bán
+                    </div>
+
+                    <div id="displayPrice"
+                         class="product-price-display">
+
+                        <c:choose>
+                            <c:when test="${not empty selectedSku}">
+
+                                <fmt:formatNumber
+                                    value="${selectedSku.price}"
+                                    pattern="#,##0"/>
+                                ₫
+
+                            </c:when>
+
+                            <c:otherwise>
+                                Liên hệ
+                            </c:otherwise>
+                        </c:choose>
+
+                    </div>
+
+                    <div class="d-flex flex-wrap
+                         align-items-center gap-2 mt-2">
+
+                        <span id="displayOriginalPrice"
+                              class="product-original-price"
+                              style="${selectedSku.originalPrice ne null and selectedSku.originalPrice > selectedSku.price ? '' : 'display:none;'}">
+
+                            <c:if test="${selectedSku.originalPrice ne null and selectedSku.originalPrice > selectedSku.price}">
+                                <fmt:formatNumber
+                                    value="${selectedSku.originalPrice}"
+                                    pattern="#,##0"/>
+                                ₫
+                            </c:if>
+                        </span>
+
+                        <span id="displayDiscount"
+                              class="product-discount"
+                              style="display:none;">
+                        </span>
+
+                    </div>
+
+                    <div id="displayStock"
+                         class="mt-3 fw-medium">
+
+                        <c:choose>
+                            <c:when test="${empty skus}">
+
+                                <span class="text-muted">
+                                    Chưa có phiên bản kinh doanh
+                                </span>
+
+                            </c:when>
+
+                            <c:when test="${selectedSku.stockQuantity > 0}">
+
+                                <span class="text-success">
+                                    <i class="bi bi-box-seam me-1"></i>
+                                    Còn ${selectedSku.stockQuantity} sản phẩm
+                                </span>
+
+                            </c:when>
+
+                            <c:otherwise>
+
+                                <span class="text-danger">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Hết hàng
+                                </span>
+
+                            </c:otherwise>
+                        </c:choose>
+
+                    </div>
+
+                </div>
+
+                <!-- ================================ -->
+                <!-- FORM THÊM GIỎ HÀNG             -->
+                <!-- ================================ -->
+
+                <form id="addToCartForm"
+                      action="${pageContext.request.contextPath}/cart"
+                      method="POST">
+
+                    <input type="hidden"
+                           name="action"
+                           value="add">
+
+                    <input type="hidden"
+                           name="productId"
+                           value="${product.productId}">
+
+                    <c:choose>
+
+                        <c:when test="${not empty skus}">
+
+                            <div class="d-flex justify-content-between
+                                 align-items-center gap-2 mb-3">
+
+                                <h5 class="fw-bold mb-0">
+                                    Chọn phiên bản
+                                </h5>
+
+                                <small class="text-muted">
+                                    ${fn:length(skus)} phiên bản
+                                </small>
+
+                            </div>
+
+                            <div class="row g-2 mb-4">
+
+                                <c:forEach items="${skus}"
+                                           var="sku">
+
+                                    <div class="col-6 col-md-4">
+
+                                        <input type="radio"
+                                               name="skuId"
+                                               id="sku_${sku.skuId}"
+                                               value="${sku.skuId}"
+                                               class="sku-radio"
+
+                                               data-price="${sku.price}"
+                                               data-original-price="${sku.originalPrice}"
+                                               data-stock="${sku.stockQuantity}"
+
+                                               ${sku.skuId eq selectedSkuId and sku.stockQuantity > 0 ? 'checked' : ''}
+                                               ${sku.stockQuantity <= 0 ? 'disabled' : ''}>
+
+                                        <label class="sku-label"
+                                               for="sku_${sku.skuId}">
+
+                                            <span class="sku-label-name">
+
+                                                <c:choose>
+
+                                                    <c:when test="${not empty sku.attributeValues}">
+
+                                                        <c:forEach items="${sku.attributeValues}"
+                                                                   var="attr"
+                                                                   varStatus="st">
+
+                                                            <c:if test="${not st.first}">
+                                                                ·
+                                                            </c:if>
+
+                                                            <c:choose>
+                                                                <c:when test="${attr.textValue ne null}">
+                                                                    <c:out value="${attr.textValue}"/>
+                                                                </c:when>
+
+                                                                <c:when test="${attr.numericValue ne null}">
+                                                                    <c:out value="${attr.numericValue}"/>
+                                                                </c:when>
+
+                                                                <c:when test="${attr.booleanValue ne null}">
+                                                                    <c:out value="${attr.booleanValue ? 'Có' : 'Không'}"/>
+                                                                </c:when>
+                                                            </c:choose>
+
+                                                        </c:forEach>
+
+                                                    </c:when>
+
+                                                    <c:otherwise>
+                                                        <c:out value="${sku.skuCode}"/>
+                                                    </c:otherwise>
+
+                                                </c:choose>
+
+                                            </span>
+
+                                            <span class="sku-label-price">
+                                                <fmt:formatNumber
+                                                    value="${sku.price}"
+                                                    pattern="#,##0"/>
+                                                ₫
+                                            </span>
+
+                                            <span class="sku-label-stock">
+
+                                                <c:choose>
+                                                    <c:when test="${sku.stockQuantity > 0}">
+                                                        Còn ${sku.stockQuantity}
+                                                    </c:when>
+
+                                                    <c:otherwise>
+                                                        Hết hàng
+                                                    </c:otherwise>
+                                                </c:choose>
+
+                                            </span>
+
+                                        </label>
+                                    </div>
+
+                                </c:forEach>
+
+                            </div>
+
+                        </c:when>
+
+                        <c:otherwise>
+
+                            <div class="alert alert-warning">
+                                Sản phẩm này hiện chưa có
+                                phiên bản để đặt mua.
+                            </div>
+
+                        </c:otherwise>
+
+                    </c:choose>
+
+                    <div class="d-grid">
+
+                        <button type="submit"
+                                class="btn btn-primary btn-lg
+                                purchase-button"
+                                id="btnAddToCart"
+                                ${not hasAvailableSku ? 'disabled' : ''}>
+
+                            <i class="bi bi-cart-plus me-2"></i>
+
+                            <span id="addToCartText">
+                                ${hasAvailableSku ? 'THÊM VÀO GIỎ HÀNG' : 'TẠM HẾT HÀNG'}
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <div class="d-flex flex-wrap gap-3
+                     text-muted small mt-4">
+
+                    <span>
+                        <i class="bi bi-shield-check me-1"></i>
+                        Thông tin theo từng phiên bản
+                    </span>
+
+                    <span>
+                        <i class="bi bi-images me-1"></i>
+                        Hình ảnh thay đổi khi chọn SKU
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ======================================== -->
+        <!-- 3. THÔNG SỐ KỸ THUẬT                    -->
+        <!-- ======================================== -->
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <jsp:include page="/WEB-INF/shop/specifications.jsp"/>
+            </div>
+        </div>
+
+        <!-- ======================================== -->
+        <!-- 4. MÔ TẢ SẢN PHẨM                       -->
+        <!-- ======================================== -->
+
+        <div class="row mt-5">
+
+            <div class="col-lg-9 mx-auto">
+
+                <h3 class="detail-section-title">
+                    Tổng quan sản phẩm
+                </h3>
+
+                <c:choose>
+
+                    <c:when test="${not empty product.description}">
+
+                        <div class="description-container"
+                             id="descContainer">
+
+                            <div class="product-description-content collapsed"
+                                 id="descContent">
+                                <c:out value="${product.description}"/>
+                            </div>
+
+                            <div class="description-overlay"
+                                 id="descOverlay">
+                            </div>
+
+                        </div>
+
+                        <div class="text-center mt-3">
+
+                            <button type="button"
+                                    class="btn btn-outline-primary"
+                                    id="btnToggleDesc"
+                                    style="display:none;">
+
+                                Xem thêm
+                                <i class="bi bi-chevron-down ms-1"></i>
+                            </button>
+
+                        </div>
+
+                    </c:when>
+
+                    <c:otherwise>
+
+                        <p class="text-muted">
+                            Mô tả sản phẩm đang được cập nhật.
+                        </p>
+
+                    </c:otherwise>
+
+                </c:choose>
+
+            </div>
+
+        </div>
+
+        <!-- ======================================== -->
+        <!-- 5. ĐÁNH GIÁ VÀ BÌNH LUẬN                 -->
+        <!-- ======================================== -->
+
+        <div class="row mt-5">
+
+            <div class="col-lg-9 mx-auto">
+
+                <h3 class="detail-section-title">
+                    Đánh giá &amp; bình luận
+                </h3>
+
+                <div class="border rounded-4 p-4 mb-4">
+
+                    <div class="row g-4 text-center">
+
+                        <div class="col-4">
+
+                            <div class="fs-3 fw-bold text-primary">
+
+                                <fmt:formatNumber
+                                    value="${purchaseCount}"
+                                    pattern="#,##0"/>
+
+                            </div>
+
+                            <div class="small text-muted">
+                                Lượt mua
+                            </div>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="fs-3 fw-bold text-primary">
+                                ${totalReviews}
+                            </div>
+
+                            <div class="small text-muted">
+                                Đánh giá
+                            </div>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="fs-3 fw-bold text-warning">
+
+                                <fmt:formatNumber
+                                    value="${averageRating}"
+                                    minFractionDigits="1"
+                                    maxFractionDigits="1"/>
+                                /5
+
+                            </div>
+
+                            <div class="small text-muted">
+                                Điểm trung bình
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <c:if test="${totalReviews == 0}">
+
+                        <p class="text-center text-muted mt-3 mb-0">
+                            Sản phẩm chưa có đánh giá.
+                        </p>
+
+                    </c:if>
+
+                </div>
+
+                <!-- ================================ -->
+                <!-- THÔNG BÁO BÁO CÁO ĐÁNH GIÁ      -->
+                <!-- ================================ -->
+
+                <c:choose>
+
+                    <c:when test="${param.report eq 'SUCCESS'}">
+
+                        <div class="alert alert-success">
+                            Báo cáo của bạn đã được gửi
+                            để nhân viên xem xét.
+                        </div>
+
+                    </c:when>
+
+                    <c:when test="${param.report eq 'RATE_LIMIT'}">
+
+                        <div class="alert alert-warning">
+                            Bạn đã gửi quá 5 báo cáo trong 24 giờ.
+                            Vui lòng thử lại sau.
+                        </div>
+
+                    </c:when>
+
+                    <c:when test="${param.report eq 'NOT_FOUND'}">
+
+                        <div class="alert alert-warning">
+                            Đánh giá không tồn tại hoặc đã bị ẩn.
+                        </div>
+
+                    </c:when>
+
+                    <c:when test="${param.report eq 'FAILED'}">
+
+                        <div class="alert alert-danger">
+                            Không thể gửi báo cáo.
+                            Vui lòng thử lại.
+                        </div>
+
+                    </c:when>
+
+                    <c:when test="${param.report eq 'DUPLICATE'}">
+
+                        <div class="alert alert-warning">
+                            Bạn đã có báo cáo đang chờ xử lý
+                            cho đánh giá này.
+                        </div>
+
+                    </c:when>
+
+                    <c:when test="${param.report eq 'OWN_REVIEW'}">
+
+                        <div class="alert alert-warning">
+                            Bạn không thể báo cáo đánh giá
+                            của chính mình.
+                        </div>
+
+                    </c:when>
+
+                    <c:when test="${param.report eq 'INVALID'}">
+
+                        <div class="alert alert-danger">
+                            Vui lòng nhập lý do báo cáo hợp lệ.
+                        </div>
+
+                    </c:when>
+
+                </c:choose>
+
+                <!-- ================================ -->
+                <!-- DANH SÁCH ĐÁNH GIÁ             -->
+                <!-- ================================ -->
+
+                <c:choose>
+
+                    <c:when test="${not empty reviews}">
+
+                        <c:forEach items="${reviews}"
+                                   var="review">
+
+                            <div class="review-card">
+
+                                <div class="d-flex
+                                     justify-content-between
+                                     align-items-start
+                                     flex-wrap gap-2 mb-3">
+
+                                    <div>
+
+                                        <div class="fw-bold mb-1">
+                                            Khách hàng
+                                        </div>
+
+                                        <div class="text-warning">
+
+                                            <c:forEach begin="1"
+                                                       end="5"
+                                                       var="star">
+
+                                                <c:choose>
+
+                                                    <c:when test="${star <= review.rating}">
+
+                                                        <i class="bi bi-star-fill"></i>
+
+                                                    </c:when>
+
+                                                    <c:otherwise>
+
+                                                        <i class="bi bi-star"></i>
+
+                                                    </c:otherwise>
+
+                                                </c:choose>
+
+                                            </c:forEach>
+
+                                            <span class="text-muted ms-1">
+                                                (${review.rating}/5)
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        <fmt:formatDate
+                                            value="${review.createdAt}"
+                                            pattern="dd/MM/yyyy HH:mm"/>
+
+                                    </small>
+
+                                </div>
+
+                                <p class="mb-3"
+                                   style="white-space:pre-line;">
+                                    <c:out value="${review.comment}"/>
+                                </p>
+
+                                <!-- ẢNH ĐÁNH GIÁ -->
+
+                                <c:if test="${not empty review.images}">
+
+                                    <div class="d-flex flex-wrap
+                                         gap-2 mb-3">
+
+                                        <c:forEach items="${review.images}"
+                                                   var="image">
+
+                                            <img src="${pageContext.request.contextPath}<c:out value='${image}'/>"
+                                                 alt="Ảnh đánh giá sản phẩm"
+                                                 class="review-image"
+                                                 loading="lazy">
+
+                                        </c:forEach>
+
+                                    </div>
+
+                                </c:if>
+
+                                <!-- BÁO CÁO ĐÁNH GIÁ -->
+
+                                <c:if test="${sessionScope.loggedInUser.customer
+                                              and sessionScope.loggedInUser.userId ne review.userId}">
+
+                                      <form action="${pageContext.request.contextPath}/review/report"
+                                            method="POST"
+                                            class="mt-3">
+
+                                          <input type="hidden"
+                                                 name="csrfToken"
+                                                 value="<c:out value='${sessionScope.reviewCsrfToken}'/>">
+
+                                          <input type="hidden"
+                                                 name="reviewId"
+                                                 value="${review.reviewId}">
+
+                                          <input type="hidden"
+                                                 name="productId"
+                                                 value="${product.productId}">
+
+                                          <label class="form-label
+                                                 small fw-semibold">
+                                              Báo cáo đánh giá
+                                          </label>
+
+                                          <div class="input-group">
+
+                                              <input type="text"
+                                                     name="reason"
+                                                     class="form-control"
+                                                     maxlength="500"
+                                                     placeholder="Nhập lý do báo cáo..."
+                                                     required>
+
+                                              <button type="submit"
+                                                      class="btn btn-outline-danger">
+
+                                                  <i class="bi bi-flag me-1"></i>
+                                                  Báo cáo
+                                              </button>
+
+                                          </div>
+
+                                      </form>
+
+                                </c:if>
+
+                            </div>
+
+                        </c:forEach>
+
+                    </c:when>
+
+                    <c:otherwise>
+
+                        <div class="text-center text-muted py-4">
+
+                            <i class="bi bi-chat-square-text fs-1"></i>
+
+                            <p class="mt-2 mb-0">
+                                Chưa có bình luận nào
+                                cho sản phẩm này.
+                            </p>
+
+                        </div>
+
+                    </c:otherwise>
+
+                </c:choose>
+
+            </div>
+
+        </div>
+
+        <!-- ======================================== -->
+        <!-- 6. SẢN PHẨM TƯƠNG TỰ - OECS V2           -->
+        <!-- ======================================== -->
+
+        <c:if test="${not empty relatedProducts}">
+
+            <style>
+                .related-section {
+                    margin-top: 55px;
+                    margin-bottom: 45px;
+                }
+
+                .related-section-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    margin-bottom: 24px;
+                }
+
+                .related-section-title {
+                    font-size: 25px;
+                    font-weight: 800;
+                    color: #142b4a;
+                    margin: 0;
+                }
+
+                .related-section-subtitle {
+                    color: #64748b;
+                    font-size: 14px;
+                    margin-top: 8px;
+                    margin-bottom: 0;
+                }
+
+                .related-card {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    border: 1px solid #e5eaf0;
+                    border-radius: 15px;
+                    overflow: hidden;
+                    background: #fff;
+                    color: inherit;
+                    text-decoration: none;
+                    transition: box-shadow .2s, transform .2s;
+                }
+
+                .related-card:hover {
+                    color: inherit;
+                    transform: translateY(-4px);
+                    box-shadow: 0 10px 28px rgba(15, 23, 42, .09);
+                    border-color: #bfdbfe;
+                }
+
+                .related-card-image {
+                    width: 100%;
+                    aspect-ratio: 1 / 1;
+                    background: #f8fafc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    padding: 15px;
+                }
+
+                .related-card-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }
+
+                .related-card-no-image {
+                    color: #cbd5e1;
+                    font-size: 48px;
+                }
+
+                .related-card-body {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    padding: 16px;
+                }
+
+                .related-card-brand {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #2563eb;
+                    margin-bottom: 7px;
+                }
+
+                .related-card-name {
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: #1e293b;
+                    line-height: 1.5;
+                    min-height: 45px;
+                    margin-bottom: 14px;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                .related-card-price-box {
+                    margin-top: auto;
+                }
+
+                .related-card-price-label {
+                    font-size: 12px;
+                    color: #64748b;
+                    margin-bottom: 4px;
+                }
+
+                .related-card-price {
+                    font-size: 19px;
+                    font-weight: 800;
+                    color: #dc2626;
+                }
+
+                .related-card-footer {
+                    border-top: 1px solid #edf0f4;
+                    margin-top: 14px;
+                    padding-top: 12px;
+                    color: #2563eb;
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+
+                @media (max-width: 575.98px) {
+                    .related-section-title {
+                        font-size: 21px;
+                    }
+
+                    .related-card-body {
+                        padding: 12px;
+                    }
+
+                    .related-card-name {
+                        font-size: 13px;
+                    }
+
+                    .related-card-price {
+                        font-size: 16px;
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .related-card {
+                        transition: none;
+                    }
+                }
+            </style>
+
+            <section class="related-section"
+                     id="relatedProducts">
+
+                <!-- HEADER -->
+
+                <div class="related-section-header">
+
+                    <div>
+
+                        <h2 class="related-section-title">
+
+                            <i class="bi bi-grid-3x3-gap
+                               text-primary me-2"></i>
+
+                            Sản phẩm tương tự
+
+                        </h2>
+
+                        <p class="related-section-subtitle">
+
+                            Các sản phẩm khác thuộc danh mục
+
+                            <strong>
+                                <c:out value="${product.category.categoryName}"/>
+                            </strong>
+
+                        </p>
+
+                    </div>
+
+                    <!-- XEM THÊM THEO DANH MỤC -->
+
+                    <c:url var="categoryUrl" value="/shop">
+                        <c:param name="categoryId"
+                                 value="${product.categoryId}"/>
+                    </c:url>
+
+                    <a href="${fn:escapeXml(categoryUrl)}"
+                       class="btn btn-outline-primary rounded-pill">
+
+                        Xem thêm sản phẩm
+
+                        <i class="bi bi-arrow-right ms-1"></i>
+
+                    </a>
+
+                </div>
+
+                <!-- DANH SÁCH SẢN PHẨM -->
+
+                <div class="row g-3 g-lg-4">
+
+                    <c:forEach items="${relatedProducts}"
+                               var="related"
+                               varStatus="st">
+
+                        <c:if test="${st.index lt 8}">
+
+                            <div class="col-6 col-lg-3">
+
+                                <!-- LINK CHI TIẾT -->
+
+                                <c:url var="relatedUrl" value="/shop">
+                                    <c:param name="action" value="detail"/>
+                                    <c:param name="id"
+                                             value="${related.productId}"/>
+                                </c:url>
+
+                                <!-- LINK ẢNH -->
+
+                                <c:set var="relatedImageUrl" value=""/>
+
+                                <c:if test="${not empty related.imageUrl}">
+
+                                    <c:choose>
+
+                                        <c:when test="${fn:startsWith(related.imageUrl, 'http://')
+                                                        or fn:startsWith(related.imageUrl, 'https://')}">
+
+                                                <c:set var="relatedImageUrl"
+                                                       value="${related.imageUrl}"/>
+
+                                        </c:when>
+
+                                        <c:otherwise>
+
+                                            <c:set var="imagePath"
+                                                   value="${related.imageUrl}"/>
+
+                                            <c:if test="${not fn:startsWith(imagePath, '/')}">
+                                                <c:set var="imagePath"
+                                                       value="/${imagePath}"/>
+                                            </c:if>
+
+                                            <c:url var="relatedImageUrl"
+                                                   value="${imagePath}"/>
+
+                                        </c:otherwise>
+
+                                    </c:choose>
+
+                                </c:if>
+
+                                <!-- CARD -->
+
+                                <a class="related-card"
+                                   href="${fn:escapeXml(relatedUrl)}">
+
+                                    <!-- IMAGE -->
+
+                                    <div class="related-card-image">
+
+                                        <c:choose>
+
+                                            <c:when test="${not empty relatedImageUrl}">
+
+                                                <img src="${fn:escapeXml(relatedImageUrl)}"
+                                                     alt="${fn:escapeXml(related.productName)}"
+                                                     loading="lazy"
+                                                     onerror="this.style.display='none';">
+
+                                            </c:when>
+
+                                            <c:otherwise>
+
+                                                <i class="bi bi-image related-card-no-image"></i>
+
+                                            </c:otherwise>
+
+                                        </c:choose>
+
+                                    </div>
+
+                                    <!-- BODY -->
+
+                                    <div class="related-card-body">
+
+                                        <div class="related-card-brand">
+
+                                            <c:out value="${related.brand.brandName}"/>
+
+                                        </div>
+
+                                        <h3 class="related-card-name">
+
+                                            <c:out value="${related.productName}"/>
+
+                                        </h3>
+
+                                        <div class="related-card-price-box">
+
+                                            <c:choose>
+
+                                                <c:when test="${related.minPrice gt 0}">
+
+                                                    <div class="related-card-price-label">
+                                                        Giá từ
+                                                    </div>
+
+                                                    <div class="related-card-price">
+
+                                                        <fmt:formatNumber
+                                                            value="${related.minPrice}"
+                                                            pattern="#,##0"/>
+
+                                                        ₫
+
+                                                    </div>
+
+                                                </c:when>
+
+                                                <c:otherwise>
+
+                                                    <span class="text-muted small">
+                                                        Đang cập nhật giá
+                                                    </span>
+
+                                                </c:otherwise>
+
+                                            </c:choose>
+
+                                        </div>
+
+                                        <div class="related-card-footer">
+
+                                            Xem chi tiết
+
+                                            <i class="bi bi-arrow-right ms-1"></i>
+
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            </div>
+
+                        </c:if>
+
+                    </c:forEach>
+
+                </div>
+
+            </section>
+
+        </c:if>
+
+
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 6. DỮ LIỆU ẢNH DÀNH CHO JAVASCRIPT           -->
+<!-- ============================================ -->
+
+<!-- Gallery chung của Product -->
+<div id="productGalleryData" hidden>
+
+    <c:if test="${not empty product.imageUrl}">
+
+        <span class="gallery-data-item"
+              data-url="<c:out value='${product.imageUrl}'/>"
+              data-alt="Ảnh đại diện sản phẩm">
+        </span>
+
+    </c:if>
+
+    <c:forEach items="${product.galleryImages}"
+               var="img">
+
+        <span class="gallery-data-item"
+              data-url="<c:out value='${img.imageUrl}'/>"
+              data-alt="<c:out value='${img.altText}'/>">
+        </span>
+
+    </c:forEach>
+
+</div>
+
+<!-- Gallery riêng từng SKU -->
+<div id="skuGalleryData" hidden>
+
+    <c:forEach items="${skus}" var="sku">
+
+        <div class="sku-gallery-data"
+             data-sku-id="${sku.skuId}">
+
+            <c:forEach items="${skuImagesBySkuId[sku.skuId]}"
+                       var="img">
+
+                <span class="gallery-data-item"
+                      data-url="<c:out value='${img.imageUrl}'/>"
+                      data-alt="<c:out value='${img.altText}'/>">
+                </span>
+
+            </c:forEach>
+
+        </div>
+
+    </c:forEach>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // ========================================
+        // 1. THAM CHIẾU CÁC THÀNH PHẦN
+        // ========================================
+
+        const mainImage =
+                document.getElementById("mainProductImage");
+
+        const galleryPlaceholder =
+                document.getElementById("galleryPlaceholder");
+
+        const galleryCount =
+                document.getElementById("galleryCount");
+
+        const galleryThumbnails =
+                document.getElementById("galleryThumbnails");
+
+        const gallerySourceLabel =
+                document.getElementById("gallerySourceLabel");
+
+        const skuRadios =
+                document.querySelectorAll(".sku-radio");
+
+        const displayPrice =
+                document.getElementById("displayPrice");
+
+        const displayOriginalPrice =
+                document.getElementById("displayOriginalPrice");
+
+        const displayDiscount =
+                document.getElementById("displayDiscount");
+
+        const displayStock =
+                document.getElementById("displayStock");
+
+        const btnAddToCart =
+                document.getElementById("btnAddToCart");
+
+        const addToCartText =
+                document.getElementById("addToCartText");
+
+        const addToCartForm =
+                document.getElementById("addToCartForm");
+
+        const contextPath =
+                "<c:out value='${pageContext.request.contextPath}'/>";
+
+        // ========================================
+        // 2. CHUẨN HÓA ĐƯỜNG DẪN ẢNH
+        // ========================================
+
+        function resolveImageUrl(path) {
+
+            if (!path) {
+                return "";
+            }
+
+            const value = path.trim();
+
+            /*
+             * Ảnh do ứng dụng quản lý thường lưu:
+             * uploads/products/abc.jpg
+             *
+             * Cũng hỗ trợ:
+             * /uploads/products/abc.jpg
+             * https://...
+             */
+
+            if (/^https?:\/\//i.test(value)) {
+                return value;
+            }
+
+            if (value.startsWith("//")) {
+                return "";
+            }
+
+            const normalized = value.replace(/^\/+/, "");
+
+            return contextPath + "/" + normalized;
+        }
+
+        // ========================================
+        // 3. ĐỌC GALLERY CHUNG
+        // ========================================
+
+        function readGallery(container) {
+
+            if (!container) {
+                return [];
+            }
+
+            const images = [];
+
+            container.querySelectorAll(".gallery-data-item")
+                    .forEach(function (item) {
+
+                        const url =
+                                resolveImageUrl(item.dataset.url);
+
+                        if (!url) {
+                            return;
+                        }
+
+                        const alreadyExists =
+                                images.some(function (image) {
+                                    return image.url === url;
+                                });
+
+                        if (alreadyExists) {
+                            return;
+                        }
+
+                        images.push({
+                            url: url,
+                            alt: item.dataset.alt || "Ảnh sản phẩm"
+                        });
+                    });
+
+            return images;
+        }
+
+        const productGallery =
+                readGallery(
+                        document.getElementById(
+                                "productGalleryData"
+                                )
+                        );
+
+        // ========================================
+        // 4. ĐỌC ẢNH CỦA TỪNG SKU
+        // ========================================
+
+        const skuGalleries = new Map();
+
+        document.querySelectorAll(".sku-gallery-data")
+                .forEach(function (container) {
+
+                    skuGalleries.set(
+                            container.dataset.skuId,
+                            readGallery(container)
+                            );
+                });
+
+        // ========================================
+        // 5. HIỂN THỊ ẢNH LỚN
+        // ========================================
+
+        function showMainImage(image, index, total) {
+
+            if (!image) {
+
+                mainImage.style.display = "none";
+                mainImage.removeAttribute("src");
+
+                galleryPlaceholder.style.display = "";
+
+                galleryCount.style.display = "none";
+
+                return;
+            }
+
+            mainImage.src = image.url;
+            mainImage.alt = image.alt;
+            mainImage.style.display = "block";
+
+            galleryPlaceholder.style.display = "none";
+
+            galleryCount.textContent =
+                    (index + 1) + " / " + total;
+
+            galleryCount.style.display = "";
+        }
+
+        // ========================================
+        // 6. RENDER THUMBNAILS
+        // ========================================
+
+        function renderGallery(images, isSkuGallery) {
+
+            galleryThumbnails.replaceChildren();
+
+            gallerySourceLabel.textContent =
+                    isSkuGallery
+                    ? "Hình ảnh của phiên bản đang chọn"
+                    : "Hình ảnh chung của sản phẩm";
+
+            if (!images || images.length === 0) {
+
+                showMainImage(null, 0, 0);
+                gallerySourceLabel.textContent =
+                        "Sản phẩm chưa có hình ảnh.";
+
+                return;
+            }
+
+            function selectImage(index) {
+
+                showMainImage(
+                        images[index],
+                        index,
+                        images.length
+                        );
+
+                galleryThumbnails
+                        .querySelectorAll(".gallery-thumb-button")
+                        .forEach(function (button, buttonIndex) {
+
+                            const selected =
+                                    buttonIndex === index;
+
+                            button.classList.toggle(
+                                    "active",
+                                    selected
+                                    );
+
+                            button.setAttribute(
+                                    "aria-pressed",
+                                    String(selected)
+                                    );
+                        });
+            }
+
+            images.forEach(function (image, index) {
+
+                const button =
+                        document.createElement("button");
+
+                button.type = "button";
+                button.className = "gallery-thumb-button";
+
+                button.setAttribute(
+                        "aria-label",
+                        "Xem ảnh " + (index + 1)
+                        );
+
+                const thumb =
+                        document.createElement("img");
+
+                thumb.src = image.url;
+                thumb.alt = image.alt;
+                thumb.loading = "lazy";
+
+                button.appendChild(thumb);
+
+                button.addEventListener("click", function () {
+                    selectImage(index);
+                });
+
+                galleryThumbnails.appendChild(button);
+            });
+
+            selectImage(0);
+        }
+
+        // ========================================
+        // 7. ĐỊNH DẠNG TIỀN
+        // ========================================
+
+        function formatPrice(value) {
+
+            if (!Number.isFinite(value)) {
+                return "Liên hệ";
+            }
+
+            return value.toLocaleString("vi-VN", {
+                maximumFractionDigits: 0
+            }) + " ₫";
+        }
+
+        function parseOptionalPrice(value) {
+
+            if (value === null
+                    || value === undefined
+                    || value.trim() === "") {
+                return null;
+            }
+
+            const number = Number(value);
+
+            return Number.isFinite(number)
+                    ? number
+                    : null;
+        }
+
+        // ========================================
+        // 8. CẬP NHẬT GIÁ VÀ TỒN KHO
+        // ========================================
+
+        function updateSkuInfo(radio) {
+
+            if (!radio) {
+
+                displayPrice.textContent = "Liên hệ";
+
+                displayOriginalPrice.style.display = "none";
+                displayDiscount.style.display = "none";
+
+                displayStock.textContent =
+                        "Chưa có phiên bản để đặt mua";
+
+                btnAddToCart.disabled = true;
+                addToCartText.textContent = "TẠM HẾT HÀNG";
+
+                return;
+            }
+
+            const price =
+                    Number(radio.dataset.price);
+
+            const originalPrice =
+                    parseOptionalPrice(
+                            radio.dataset.originalPrice
+                            );
+
+            const stock =
+                    Number(radio.dataset.stock);
+
+            displayPrice.textContent =
+                    formatPrice(price);
+
+            if (originalPrice !== null
+                    && originalPrice > price) {
+
+                displayOriginalPrice.textContent =
+                        formatPrice(originalPrice);
+
+                displayOriginalPrice.style.display = "";
+
+                const discount =
+                        Math.round(
+                                (originalPrice - price)
+                                / originalPrice * 100
+                                );
+
+                displayDiscount.textContent =
+                        "-" + discount + "%";
+
+                displayDiscount.style.display = "";
+
+            } else {
+
+                displayOriginalPrice.style.display = "none";
+                displayDiscount.style.display = "none";
+            }
+
+            if (stock > 0) {
+
+                displayStock.className =
+                        "mt-3 fw-medium text-success";
+
+                displayStock.textContent =
+                        "Còn " + stock + " sản phẩm";
+
+                btnAddToCart.disabled = false;
+                addToCartText.textContent =
+                        "THÊM VÀO GIỎ HÀNG";
+
+            } else {
+
+                displayStock.className =
+                        "mt-3 fw-medium text-danger";
+
+                displayStock.textContent =
+                        "Hết hàng";
+
+                btnAddToCart.disabled = true;
+                addToCartText.textContent =
+                        "TẠM HẾT HÀNG";
+            }
+        }
+
+        // ========================================
+        // 9. CẬP NHẬT ẢNH THEO SKU
+        // ========================================
+
+
+        function updateSkuGallery(skuId) {
+
+            // Ảnh riêng của SKU được chọn
+            const skuImages =
+                    skuGalleries.get(String(skuId)) || [];
+
+            // Ảnh chung và ảnh phụ của sản phẩm
+            const commonImages = productGallery || [];
+
+            // Ưu tiên ảnh SKU trước, ảnh chung sau
+            const combinedImages = [
+                ...skuImages,
+                ...commonImages
+            ];
+
+            // Loại bỏ ảnh trùng URL
+            const uniqueImages = [];
+            const seenUrls = new Set();
+
+            combinedImages.forEach(function (image) {
+
+                if (!image || !image.url) {
+                    return;
+                }
+
+                if (seenUrls.has(image.url)) {
+                    return;
+                }
+
+                seenUrls.add(image.url);
+                uniqueImages.push(image);
+            });
+
+            // Hiển thị toàn bộ ảnh đã kết hợp
+            renderGallery(
+                    uniqueImages,
+                    skuImages.length > 0
+                    );
+
+            // Cập nhật nhãn gallery
+            if (gallerySourceLabel) {
+
+                gallerySourceLabel.textContent =
+                        skuImages.length > 0
+                        ? "Ảnh phiên bản và ảnh chung của sản phẩm"
+                        : "Hình ảnh chung của sản phẩm";
+            }
+        }
+
+
+        // ========================================
+        // 10. SỰ KIỆN ĐỔI SKU
+        // ========================================
+
+        skuRadios.forEach(function (radio) {
+
+            radio.addEventListener("change", function () {
+
+                if (!this.checked || this.disabled) {
+                    return;
+                }
+
+                updateSkuInfo(this);
+                updateSkuGallery(this.value);
+            });
+        });
+
+        // ========================================
+        // 11. KHỞI TẠO SKU MẶC ĐỊNH
+        // ========================================
+
+        const selectedRadio =
+                document.querySelector(
+                        ".sku-radio:checked:not(:disabled)"
+                        );
+
+        if (selectedRadio) {
+
+            updateSkuInfo(selectedRadio);
+
+            updateSkuGallery(
+                    selectedRadio.value
+                    );
+
+        } else {
+
+            /*
+             * Không có SKU còn hàng.
+             *
+             * Vẫn hiển thị thông tin SKU đầu tiên
+             * nếu danh sách có SKU.
+             */
+
+            const firstSku =
+                    skuRadios.length > 0
+                    ? skuRadios[0]
+                    : null;
+
+            updateSkuInfo(firstSku);
+
+            if (firstSku) {
+
+                updateSkuGallery(firstSku.value);
+
+            } else {
+
+                renderGallery(
+                        productGallery,
+                        false
+                        );
+            }
+
+            btnAddToCart.disabled = true;
+            addToCartText.textContent =
+                    "TẠM HẾT HÀNG";
+        }
+
+        // ========================================
+        // 12. BẢO VỆ FORM GIỎ HÀNG
+        // ========================================
+
+        if (addToCartForm) {
+
+            addToCartForm.addEventListener(
+                    "submit",
+                    function (event) {
+
+                        const checked =
+                                document.querySelector(
+                                        ".sku-radio:checked:not(:disabled)"
+                                        );
+
+                        if (!checked
+                                || Number(checked.dataset.stock) <= 0) {
+
+                            event.preventDefault();
+
+                            alert(
+                                    "Vui lòng chọn phiên bản "
+                                    + "còn hàng trước khi thêm vào giỏ."
+                                    );
+                        }
+
+                        /*
+                         * Servlet /cart vẫn phải kiểm tra
+                         * giá, trạng thái và tồn kho ở server.
+                         */
+                    });
+        }
+
+        // ========================================
+        // 13. XEM THÊM MÔ TẢ
+        // ========================================
+
+        const descContent =
+                document.getElementById("descContent");
+
+        const descOverlay =
+                document.getElementById("descOverlay");
+
+        const btnToggleDesc =
+                document.getElementById("btnToggleDesc");
+
+        if (descContent && descOverlay && btnToggleDesc) {
+
+            function shouldCollapse() {
+
+                descContent.classList.remove("collapsed");
+
+                const fullHeight =
+                        descContent.scrollHeight;
+
+                if (fullHeight > 250) {
+
+                    descContent.classList.add("collapsed");
+                    descOverlay.classList.remove("hidden");
+                    btnToggleDesc.style.display = "";
+
+                } else {
+
+                    descOverlay.classList.add("hidden");
+                    btnToggleDesc.style.display = "none";
+                }
+            }
+
+            shouldCollapse();
+
+            btnToggleDesc.addEventListener(
+                    "click",
+                    function () {
+
+                        const collapsed =
+                                descContent.classList.contains(
+                                        "collapsed"
+                                        );
+
+                        if (collapsed) {
+
+                            descContent.classList.remove("collapsed");
+
+                            descOverlay.classList.add("hidden");
+
+                            btnToggleDesc.innerHTML =
+                                    'Thu gọn <i class="bi bi-chevron-up ms-1"></i>';
+
+                        } else {
+
+                            descContent.classList.add("collapsed");
+
+                            descOverlay.classList.remove("hidden");
+
+                            btnToggleDesc.innerHTML =
+                                    'Xem thêm <i class="bi bi-chevron-down ms-1"></i>';
+
+                            document.getElementById(
+                                    "descContainer"
+                                    ).scrollIntoView({
+                                behavior: "smooth",
+                                block: "start"
+                            });
+                        }
+                    });
+        }
+    });
+</script>
+
+<%@include file="/WEB-INF/include/footer.jsp"%>
