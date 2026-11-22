@@ -892,60 +892,250 @@
         <%-- 4. MÔ TẢ SẢN PHẨM                       --%>
         <%-- ======================================== --%>
 
-        <div class="row mt-5">
 
-            <div class="col-lg-9 mx-auto">
+
+        <%-- =========================================
+             4. MÔ TẢ SẢN PHẨM - OECS V2
+             ========================================= --%>
+
+        <style>
+            .product-description-section {
+                margin-top: 48px;
+            }
+
+            .product-description-box {
+                background: #fff;
+                border: 1px solid #e8edf3;
+                border-radius: 18px;
+                padding: 28px;
+            }
+
+            .product-description-intro {
+                color: #475569;
+                line-height: 1.9;
+                font-size: 15px;
+                white-space: pre-line;
+            }
+
+            .product-description-item {
+                padding: 24px 0;
+                border-top: 1px solid #edf0f4;
+            }
+
+            .product-description-item:first-child {
+                border-top: none;
+            }
+
+            .product-description-item h4 {
+                font-size: 20px;
+                font-weight: 750;
+                color: #172033;
+                margin-bottom: 14px;
+            }
+
+            .product-description-item p {
+                color: #475569;
+                font-size: 15px;
+                line-height: 1.9;
+                white-space: pre-line;
+                margin-bottom: 0;
+            }
+
+            .product-description-image {
+                display: block;
+                width: 100%;
+                max-height: 420px;
+                object-fit: contain;
+                border-radius: 14px;
+                margin-top: 20px;
+                background: #f8fafc;
+            }
+
+            @media (max-width: 575.98px) {
+                .product-description-box {
+                    padding: 18px;
+                }
+
+                .product-description-item h4 {
+                    font-size: 18px;
+                }
+            }
+        </style>
+
+        <div class="row mt-5 product-description-section">
+
+            <div class="col-lg-10 mx-auto">
 
                 <h3 class="detail-section-title">
-                    Tổng quan sản phẩm
+                    Mô tả sản phẩm
                 </h3>
 
-                <c:choose>
+                <div class="product-description-box">
 
-                    <c:when test="${not empty product.description}">
+                    <c:choose>
 
-                        <div class="description-container"
-                             id="descContainer">
+                        <c:when test="${not empty product.description
+                                        or not empty overviewSections}">
 
-                            <div class="product-description-content collapsed"
-                                 id="descContent">
-                                <c:out value="${product.description}"/>
-                            </div>
+                                <div id="descContainer"
+                                     class="description-container">
 
-                            <div class="description-overlay"
-                                 id="descOverlay">
-                            </div>
+                                    <div id="descContent"
+                                         class="product-description-content collapsed">
 
-                        </div>
+                                        <%-- ===========================
+                                             MÔ TẢ CHÍNH
+                                             =========================== --%>
 
-                        <div class="text-center mt-3">
+                                        <c:if test="${not empty product.description}">
 
-                            <button type="button"
-                                    class="btn btn-outline-primary"
-                                    id="btnToggleDesc"
-                                    style="display:none;">
+                                            <div class="product-description-intro">
 
-                                Xem thêm
-                                <i class="bi bi-chevron-down ms-1"></i>
-                            </button>
+                                                <c:out value="${product.description}"/>
 
-                        </div>
+                                            </div>
 
-                    </c:when>
+                                        </c:if>
 
-                    <c:otherwise>
+                                        <%-- ===========================
+                                             NỘI DUNG CHI TIẾT
+                                             =========================== --%>
 
-                        <p class="text-muted">
-                            Mô tả sản phẩm đang được cập nhật.
-                        </p>
+                                        <c:forEach items="${overviewSections}"
+                                                   var="section">
 
-                    </c:otherwise>
+                                            <div class="product-description-item">
 
-                </c:choose>
+                                                <h4>
+                                                    <c:out value="${section.sectionTitle}"/>
+                                                </h4>
+
+                                                <p>
+                                                    <c:out value="${section.sectionContent}"/>
+                                                </p>
+
+                                                <%-- =====================
+                                                     ẢNH MINH HỌA
+                                                     ===================== --%>
+
+                                                <c:if test="${not empty section.imageUrl}">
+
+                                                    <%-- Reset URL cho mỗi section --%>
+
+                                                    <c:set var="descImageUrl"
+                                                           value=""/>
+
+                                                    <c:choose>
+
+                                                        <%-- Ảnh từ HTTPS/HTTP --%>
+
+                                                        <c:when test="${fn:startsWith(section.imageUrl, 'https://')
+                                                                        or fn:startsWith(section.imageUrl, 'http://')}">
+
+                                                                <c:set var="descImageUrl"
+                                                                       value="${section.imageUrl}"/>
+
+                                                        </c:when>
+
+                                                        <%-- Ảnh từ thư mục trong ứng dụng --%>
+
+                                                        <c:when test="${not fn:startsWith(section.imageUrl, '//')
+                                                                        and not fn:contains(section.imageUrl, '://')}">
+
+                                                                <c:set var="descImagePath"
+                                                                       value="${section.imageUrl}"/>
+
+                                                                <%-- Thêm dấu / ở đầu nếu thiếu --%>
+
+                                                                <c:if test="${not fn:startsWith(descImagePath, '/')}">
+
+                                                                    <c:set var="descImagePath"
+                                                                           value="/${descImagePath}"/>
+
+                                                                </c:if>
+
+                                                                <%-- Tạo URL có context path --%>
+
+                                                                <c:url var="descImageUrl"
+                                                                       value="${descImagePath}"/>
+
+                                                        </c:when>
+
+                                                    </c:choose>
+
+                                                    <%-- Chỉ render khi URL hợp lệ --%>
+
+                                                    <c:if test="${not empty descImageUrl}">
+
+                                                        <img class="product-description-image"
+                                                             src="${fn:escapeXml(descImageUrl)}"
+                                                             alt="${fn:escapeXml(
+                                                                    empty section.imageAlt
+                                                                    ? section.sectionTitle
+                                                                    : section.imageAlt
+                                                                    )}"
+                                                             loading="lazy"
+                                                             onerror="this.style.display='none';">
+
+                                                    </c:if>
+
+                                                </c:if>
+
+                                            </div>
+
+                                        </c:forEach>
+
+                                    </div>
+
+                                    <%-- ===========================
+                                         GRADIENT THU GỌN
+                                         =========================== --%>
+
+                                    <div id="descOverlay"
+                                         class="description-overlay">
+                                    </div>
+
+                                </div>
+
+                                <%-- ===========================
+                                     NÚT XEM THÊM / THU GỌN
+                                     =========================== --%>
+
+                                <div class="text-center mt-4">
+
+                                    <button type="button"
+                                            class="btn btn-outline-primary rounded-pill px-4"
+                                            id="btnToggleDesc"
+                                            style="display:none;">
+
+                                        Xem thêm mô tả
+
+                                        <i class="bi bi-chevron-down ms-1"></i>
+
+                                    </button>
+
+                                </div>
+
+                        </c:when>
+
+                        <c:otherwise>
+
+                            <p class="text-muted mb-0">
+
+                                Mô tả sản phẩm đang được cập nhật.
+
+                            </p>
+
+                        </c:otherwise>
+
+                    </c:choose>
+
+                </div>
 
             </div>
 
         </div>
+
 
         <%-- ======================================== --%>
         <%-- 5. ĐÁNH GIÁ VÀ BÌNH LUẬN                 --%>

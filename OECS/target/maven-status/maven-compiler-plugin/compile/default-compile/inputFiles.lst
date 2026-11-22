@@ -78,6 +78,7 @@ D:\SKU_FIX\OECS\src\main\java\service\AuditLogService.java
 D:\SKU_FIX\OECS\src\main\java\controller\OrderSuccessServlet.java
 D:\SKU_FIX\OECS\src\main\java\dao\ReportDAO.java
 D:\SKU_FIX\OECS\src\main\java\controller\ReviewServlet.java
+D:\SKU_FIX\OECS\src\main\java\model\ProductOverviewSection.java
 D:\SKU_FIX\OECS\src\main\java\dao\AttributeDAO.java
 D:\SKU_FIX\OECS\src\main\java\model\ProductSku.java
 D:\SKU_FIX\OECS\src\main\java\controller\CheckoutServlet.java
@@ -107,6 +108,7 @@ D:\SKU_FIX\OECS\src\main\java\dao\PasswordResetDAO.java
 D:\SKU_FIX\OECS\src\main\java\controller\ReportExportServlet.java
 D:\SKU_FIX\OECS\src\main\java\service\OrderStatusPolicy.java
 D:\SKU_FIX\OECS\src\main\java\dao\PaymentDAO.java
+D:\SKU_FIX\OECS\src\main\java\dao\SkuHardDeleteDAO.java
 D:\SKU_FIX\OECS\src\main\java\model\Cart.java
 D:\SKU_FIX\OECS\src\main\java\dao\OrderDAO.java
 D:\SKU_FIX\OECS\src\main\java\controller\SearchApiServlet.java

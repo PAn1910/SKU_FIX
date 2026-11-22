@@ -3,6 +3,7 @@ package dao;
 import db.DBContext;
 
 import model.Brand;
+import model.ProductOverviewSection;
 import model.Category;
 import model.Product;
 import model.ProductImage;
@@ -1177,4 +1178,115 @@ public class ShopDAO extends DBContext {
 
         return product;
     }
+
+    public Map<String, List<ProductSpec>> getProductSpecGroups(
+            int productId) {
+
+        Map<String, List<ProductSpec>> groups
+                = new LinkedHashMap<>();
+
+        String sql
+                = "SELECT "
+                + "COALESCE(NULLIF(LTRIM(RTRIM(ca.group_name)), ''), "
+                + "N'Thông số khác') AS group_name, "
+                + "a.attribute_name, "
+                + "ps.value "
+                + "FROM dbo.PRODUCT_SPECIFICATION ps "
+                + "JOIN dbo.PRODUCT p "
+                + "ON p.product_id = ps.product_id "
+                + "JOIN dbo.ATTRIBUTE a "
+                + "ON a.attribute_id = ps.attribute_id "
+                + "LEFT JOIN dbo.CATEGORY_ATTRIBUTE ca "
+                + "ON ca.category_id = p.category_id "
+                + "AND ca.attribute_id = ps.attribute_id "
+                + "WHERE ps.product_id = ? "
+                + "ORDER BY "
+                + "COALESCE(ca.group_name, N'Thông số khác'), "
+                + "COALESCE(ca.display_order, 9999), "
+                + "a.attribute_name";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, productId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    String groupName
+                            = rs.getString("group_name");
+
+                    ProductSpec spec = new ProductSpec(
+                            rs.getString("attribute_name"),
+                            rs.getString("value")
+                    );
+
+                    groups.computeIfAbsent(
+                            groupName,
+                            k -> new ArrayList<>()
+                    ).add(spec);
+                }
+            }
+
+        } catch (SQLException ex) {
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Không thể tải nhóm thông số sản phẩm",
+                    ex
+            );
+        }
+
+        return groups;
+    }
+
+    public List<ProductOverviewSection> getProductOverviewSections(
+            int productId) {
+
+        List<ProductOverviewSection> sections = new ArrayList<>();
+
+        String sql
+                = "SELECT section_id, product_id, section_key, "
+                + "section_title, section_content, image_url, "
+                + "image_alt, display_order "
+                + "FROM dbo.PRODUCT_CONTENT_SECTION "
+                + "WHERE product_id = ? AND is_active = 1 "
+                + "ORDER BY display_order ASC, section_id ASC";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, productId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    ProductOverviewSection section
+                            = new ProductOverviewSection(
+                                    rs.getInt("section_id"),
+                                    rs.getInt("product_id"),
+                                    rs.getString("section_key"),
+                                    rs.getString("section_title"),
+                                    rs.getString("section_content"),
+                                    rs.getString("image_url"),
+                                    rs.getString("image_alt"),
+                                    rs.getInt("display_order")
+                            );
+
+                    sections.add(section);
+                }
+            }
+
+        } catch (SQLException ex) {
+
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Không thể tải nội dung Tổng quan sản phẩm "
+                    + productId,
+                    ex
+            );
+        }
+
+        return sections;
+    }
+
 }

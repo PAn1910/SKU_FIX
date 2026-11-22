@@ -9,25 +9,23 @@
 <div class="row justify-content-center">
     <div class="col-12 col-xl-11">
 
-        <!-- ======================================= -->
-        <!-- 1. ĐIỀU HƯỚNG                         -->
-        <!-- ======================================= -->
+        <%-- ========================================
+             1. ĐIỀU HƯỚNG
+             ======================================== --%>
 
         <div class="mb-3">
             <a href="${pageContext.request.contextPath}/product-sku?productId=${product.productId}"
                class="text-decoration-none text-muted fw-medium">
-
                 <i class="bi bi-arrow-left me-1"></i>
                 Quay lại quản lý SKU
             </a>
         </div>
 
-        <!-- ======================================= -->
-        <!-- 2. THÔNG BÁO                          -->
-        <!-- ======================================= -->
+        <%-- ========================================
+             2. THÔNG BÁO
+             ======================================== --%>
 
         <c:if test="${not empty sessionScope.errorMsg}">
-
             <div class="alert alert-danger alert-dismissible fade show"
                  role="alert">
 
@@ -45,7 +43,6 @@
         </c:if>
 
         <c:if test="${not empty sessionScope.successMsg}">
-
             <div class="alert alert-success alert-dismissible fade show"
                  role="alert">
 
@@ -62,9 +59,9 @@
             <c:remove var="successMsg" scope="session"/>
         </c:if>
 
-        <!-- ======================================= -->
-        <!-- 3. TIÊU ĐỀ                            -->
-        <!-- ======================================= -->
+        <%-- ========================================
+             3. TIÊU ĐỀ
+             ======================================== --%>
 
         <div class="card shadow-sm border-0 rounded-4 mb-4">
             <div class="card-body p-4">
@@ -78,7 +75,6 @@
                              rounded d-flex align-items-center
                              justify-content-center me-3"
                              style="width:48px;height:48px;">
-
                             <i class="bi bi-grid-3x3-gap fs-4"></i>
                         </div>
 
@@ -103,7 +99,6 @@
 
                     <span class="badge bg-primary-subtle
                           text-primary border p-2">
-
                         <i class="bi bi-boxes me-1"></i>
                         OECS V2
                     </span>
@@ -111,9 +106,9 @@
             </div>
         </div>
 
-        <!-- ======================================= -->
-        <!-- 4. HƯỚNG DẪN                          -->
-        <!-- ======================================= -->
+        <%-- ========================================
+             4. HƯỚNG DẪN
+             ======================================== --%>
 
         <div class="alert alert-info border-0 mb-4">
 
@@ -124,9 +119,8 @@
 
             <p class="mb-2">
                 <strong>Bước 1:</strong>
-                Nhập các lựa chọn cho từng thuộc tính
-                biến thể, sau đó chọn
-                <strong>Tạo bản xem trước</strong>.
+                Nhập các lựa chọn cho từng thuộc tính biến thể,
+                sau đó chọn <strong>Tạo bản xem trước</strong>.
             </p>
 
             <p class="mb-0">
@@ -137,12 +131,11 @@
             </p>
         </div>
 
-        <!-- ======================================= -->
-        <!-- 5. FORM SINH PREVIEW                   -->
-        <!-- ======================================= -->
+        <%-- ========================================
+             5. FORM TẠO SKU HÀNG LOẠT
+             ======================================== --%>
 
         <div class="card shadow-sm border-0 rounded-4 mb-4">
-
             <div class="card-body p-4">
 
                 <div class="d-flex align-items-center mb-4">
@@ -151,7 +144,6 @@
                          d-flex align-items-center
                          justify-content-center me-3"
                          style="width:40px;height:40px;">
-
                         <span class="fw-bold text-primary">1</span>
                     </div>
 
@@ -168,10 +160,11 @@
 
                 <c:choose>
 
+                    <%-- Không có thuộc tính biến thể --%>
+
                     <c:when test="${empty variantAttributes}">
 
                         <div class="alert alert-warning mb-0">
-
                             <i class="bi bi-exclamation-triangle me-2"></i>
 
                             Danh mục của sản phẩm này chưa có
@@ -183,6 +176,8 @@
                         </div>
 
                     </c:when>
+
+                    <%-- Có thuộc tính biến thể --%>
 
                     <c:otherwise>
 
@@ -198,9 +193,9 @@
                                    name="productId"
                                    value="${product.productId}">
 
-                            <!-- ======================= -->
-                            <!-- THUỘC TÍNH BIẾN THỂ   -->
-                            <!-- ======================= -->
+                            <%-- =========================
+                                 5.1. GIÁ TRỊ BIẾN THỂ
+                                 ========================= --%>
 
                             <div class="mb-4">
 
@@ -228,8 +223,8 @@
                                                 </label>
 
                                                 <div class="small text-muted mb-2">
-
                                                     Kiểu dữ liệu:
+
                                                     <strong>
                                                         <c:out value="${config.dataType}"/>
                                                     </strong>
@@ -240,42 +235,53 @@
                                                     </c:if>
                                                 </div>
 
+                                                <%-- QUAN TRỌNG:
+                                                     Không dùng comment HTML
+                                                     trực tiếp trong c:choose.
+                                                --%>
+
                                                 <c:choose>
 
-                                                    <!-- BOOLEAN -->
+                                                    <%-- BOOLEAN --%>
+
                                                     <c:when test="${config.dataType eq 'BOOLEAN'}">
 
                                                         <div class="form-check mb-2">
 
-                                                            <input class="form-check-input"
-                                                                   type="checkbox"
-                                                                   name="option_${config.attributeId}"
-                                                                   value="true"
-                                                                   id="option_${config.attributeId}_true">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                name="option_${config.attributeId}"
+                                                                value="true"
+                                                                id="option_${config.attributeId}_true">
 
-                                                            <label class="form-check-label"
-                                                                   for="option_${config.attributeId}_true">
+                                                            <label
+                                                                class="form-check-label"
+                                                                for="option_${config.attributeId}_true">
                                                                 Có
                                                             </label>
                                                         </div>
 
                                                         <div class="form-check">
 
-                                                            <input class="form-check-input"
-                                                                   type="checkbox"
-                                                                   name="option_${config.attributeId}"
-                                                                   value="false"
-                                                                   id="option_${config.attributeId}_false">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                name="option_${config.attributeId}"
+                                                                value="false"
+                                                                id="option_${config.attributeId}_false">
 
-                                                            <label class="form-check-label"
-                                                                   for="option_${config.attributeId}_false">
+                                                            <label
+                                                                class="form-check-label"
+                                                                for="option_${config.attributeId}_false">
                                                                 Không
                                                             </label>
                                                         </div>
 
                                                     </c:when>
 
-                                                    <!-- TEXT / NUMBER -->
+                                                    <%-- TEXT / NUMBER --%>
+
                                                     <c:otherwise>
 
                                                         <textarea
@@ -305,9 +311,9 @@
                                 </div>
                             </div>
 
-                            <!-- ======================= -->
-                            <!-- THÔNG TIN CHUNG SKU   -->
-                            <!-- ======================= -->
+                            <%-- =========================
+                                 5.2. THÔNG TIN CHUNG SKU
+                                 ========================= --%>
 
                             <div class="border-top pt-4 mb-4">
 
@@ -404,9 +410,9 @@
                                 </div>
                             </div>
 
-                            <!-- ======================= -->
-                            <!-- GỢI Ý SỐ TỔ HỢP       -->
-                            <!-- ======================= -->
+                            <%-- =========================
+                                 5.3. SỐ TỔ HỢP DỰ KIẾN
+                                 ========================= --%>
 
                             <div class="bg-light rounded-3 p-3 mb-4">
 
@@ -429,12 +435,13 @@
                                         Các giá trị trùng trong cùng
                                         một thuộc tính được loại bỏ.
                                     </div>
+
                                 </div>
                             </div>
 
-                            <!-- ======================= -->
-                            <!-- NÚT SINH PREVIEW      -->
-                            <!-- ======================= -->
+                            <%-- =========================
+                                 5.4. TẠO PREVIEW
+                                 ========================= --%>
 
                             <div class="d-flex justify-content-end">
 
@@ -456,9 +463,9 @@
             </div>
         </div>
 
-        <!-- ======================================= -->
-        <!-- 6. DANH SÁCH SKU PREVIEW               -->
-        <!-- ======================================= -->
+        <%-- ========================================
+             6. DANH SÁCH SKU XEM TRƯỚC
+             ======================================== --%>
 
         <c:if test="${not empty previewSkuList}">
 
@@ -467,7 +474,7 @@
 
                 <div class="card-body p-0">
 
-                    <!-- HEADER -->
+                    <%-- HEADER PREVIEW --%>
 
                     <div class="p-4 border-bottom">
 
@@ -481,7 +488,9 @@
                                      justify-content-center me-3"
                                      style="width:40px;height:40px;">
 
-                                    <span class="fw-bold text-primary">2</span>
+                                    <span class="fw-bold text-primary">
+                                        2
+                                    </span>
                                 </div>
 
                                 <div>
@@ -500,10 +509,11 @@
 
                                 ${fn:length(previewSkuList)} SKU mới
                             </span>
+
                         </div>
                     </div>
 
-                    <!-- LƯU Ý -->
+                    <%-- THÔNG BÁO PREVIEW --%>
 
                     <div class="px-4 pt-4">
 
@@ -520,9 +530,9 @@
                         </div>
                     </div>
 
-                    <!-- ======================= -->
-                    <!-- FORM XÁC NHẬN          -->
-                    <!-- ======================= -->
+                    <%-- =========================
+                         6.1. FORM XÁC NHẬN
+                         ========================= --%>
 
                     <form id="bulkCommitForm"
                           action="${pageContext.request.contextPath}/sku-bulk"
@@ -542,10 +552,10 @@
 
                         <div class="table-responsive">
 
-                            <table class="table table-hover
-                                   align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0">
 
                                 <thead class="table-light">
+
                                     <tr>
                                         <th class="ps-4"
                                             style="min-width:70px;">
@@ -576,151 +586,159 @@
                                             TRẠNG THÁI
                                         </th>
                                     </tr>
+
                                 </thead>
 
                                 <tbody>
 
-                                <c:forEach items="${previewSkuList}"
-                                           var="sku"
-                                           varStatus="status">
+                                    <c:forEach items="${previewSkuList}"
+                                               var="sku"
+                                               varStatus="status">
 
-                                    <fmt:formatNumber
-                                        value="${sku.price}"
-                                        pattern="#,##0"
-                                        var="formattedPrice"/>
-
-                                    <c:set var="formattedOriginalPrice"
-                                           value=""/>
-
-                                    <c:if test="${sku.originalPrice ne null}">
+                                        <%-- Định dạng tiền cho input --%>
 
                                         <fmt:formatNumber
-                                            value="${sku.originalPrice}"
+                                            value="${sku.price}"
                                             pattern="#,##0"
-                                            var="formattedOriginalPrice"/>
+                                            var="formattedPrice"/>
 
-                                    </c:if>
+                                        <c:set var="formattedOriginalPrice"
+                                               value=""/>
 
-                                    <tr>
+                                        <c:if test="${sku.originalPrice ne null}">
 
-                                        <!-- STT -->
-                                        <td class="ps-4 fw-semibold">
-                                            ${status.count}
-                                        </td>
+                                            <fmt:formatNumber
+                                                value="${sku.originalPrice}"
+                                                pattern="#,##0"
+                                                var="formattedOriginalPrice"/>
 
-                                        <!-- GIÁ TRỊ BIẾN THỂ -->
-                                        <td>
+                                        </c:if>
 
-                                            <div class="d-flex flex-wrap gap-1">
+                                        <tr>
 
-                                                <c:forEach items="${sku.attributeValues}"
-                                                           var="attr">
+                                            <%-- STT --%>
 
-                                                    <span class="badge bg-light
-                                                          text-dark border">
+                                            <td class="ps-4 fw-semibold">
+                                                ${status.count}
+                                            </td>
 
-                                                        <c:choose>
+                                            <%-- BIẾN THỂ --%>
 
-                                                            <c:when test="${attr.textValue ne null}">
-                                                                <c:out value="${attr.textValue}"/>
-                                                            </c:when>
+                                            <td>
 
-                                                            <c:when test="${attr.numericValue ne null}">
-                                                                <c:out value="${attr.numericValue}"/>
-                                                            </c:when>
+                                                <div class="d-flex flex-wrap gap-1">
 
-                                                            <c:when test="${attr.booleanValue ne null}">
-                                                                ${attr.booleanValue ? 'Có' : 'Không'}
-                                                            </c:when>
+                                                    <c:forEach items="${sku.attributeValues}"
+                                                               var="attr">
 
-                                                        </c:choose>
+                                                        <span class="badge bg-light
+                                                              text-dark border">
 
-                                                    </span>
+                                                            <c:choose>
 
-                                                </c:forEach>
+                                                                <c:when test="${attr.textValue ne null}">
+                                                                    <c:out value="${attr.textValue}"/>
+                                                                </c:when>
 
-                                            </div>
+                                                                <c:when test="${attr.numericValue ne null}">
+                                                                    <fmt:formatNumber
+                                                                        value="${attr.numericValue}"
+                                                                        pattern="0.####"
+                                                                        groupingUsed="false"/>
+                                                                </c:when>
 
-                                            <div class="small text-muted mt-1">
-                                                Tổ hợp cố định từ preview
-                                            </div>
-                                        </td>
+                                                                <c:when test="${attr.booleanValue ne null}">
+                                                                    <c:out value="${attr.booleanValue ? 'Có' : 'Không'}"/>
+                                                                </c:when>
 
-                                        <!-- MÃ SKU -->
-                                        <td>
+                                                            </c:choose>
 
-                                            <input type="text"
-                                                   name="skuCode"
-                                                   class="form-control form-control-sm sku-code-input"
-                                                   maxlength="100"
-                                                   value="<c:out value='${sku.skuCode}'/>"
-                                                   required>
-                                        </td>
+                                                        </span>
 
-                                        <!-- GIÁ BÁN -->
-                                        <td>
+                                                    </c:forEach>
 
-                                            <input type="text"
-                                                   name="priceStr"
-                                                   class="form-control form-control-sm money-input"
-                                                   inputmode="numeric"
-                                                   value="<c:out value='${formattedPrice}'/>"
-                                                   required>
-                                        </td>
+                                                </div>
 
-                                        <!-- GIÁ NIÊM YẾT -->
-                                        <td>
+                                                <div class="small text-muted mt-1">
+                                                    Tổ hợp cố định từ preview
+                                                </div>
+                                            </td>
 
-                                            <input type="text"
-                                                   name="originalPriceStr"
-                                                   class="form-control form-control-sm money-input"
-                                                   inputmode="numeric"
-                                                   value="<c:out value='${formattedOriginalPrice}'/>">
-                                        </td>
+                                            <%-- MÃ SKU --%>
 
-                                        <!-- TỒN KHO -->
-                                        <td>
+                                            <td>
+                                                <input type="text"
+                                                       name="skuCode"
+                                                       class="form-control form-control-sm sku-code-input"
+                                                       maxlength="100"
+                                                       value="<c:out value='${sku.skuCode}'/>"
+                                                       required>
+                                            </td>
 
-                                            <input type="number"
-                                                   name="stock"
-                                                   class="form-control form-control-sm"
-                                                   min="0"
-                                                   step="1"
-                                                   value="${sku.stockQuantity}"
-                                                   required>
-                                        </td>
+                                            <%-- GIÁ BÁN --%>
 
-                                        <!-- TRẠNG THÁI -->
-                                        <td>
+                                            <td>
+                                                <input type="text"
+                                                       name="priceStr"
+                                                       class="form-control form-control-sm money-input"
+                                                       inputmode="numeric"
+                                                       value="<c:out value='${formattedPrice}'/>"
+                                                       required>
+                                            </td>
 
-                                            <select name="isActive"
-                                                    class="form-select form-select-sm">
+                                            <%-- GIÁ NIÊM YẾT --%>
 
-                                                <option value="true"
-                                                        ${sku.active ? 'selected' : ''}>
-                                                    Đang bán
-                                                </option>
+                                            <td>
+                                                <input type="text"
+                                                       name="originalPriceStr"
+                                                       class="form-control form-control-sm money-input"
+                                                       inputmode="numeric"
+                                                       value="<c:out value='${formattedOriginalPrice}'/>">
+                                            </td>
 
-                                                <option value="false"
-                                                        ${not sku.active ? 'selected' : ''}>
-                                                    Ngừng bán
-                                                </option>
+                                            <%-- TỒN KHO --%>
 
-                                            </select>
-                                        </td>
+                                            <td>
+                                                <input type="number"
+                                                       name="stock"
+                                                       class="form-control form-control-sm"
+                                                       min="0"
+                                                       step="1"
+                                                       value="${sku.stockQuantity}"
+                                                       required>
+                                            </td>
 
-                                    </tr>
+                                            <%-- TRẠNG THÁI --%>
 
-                                </c:forEach>
+                                            <td>
+                                                <select name="isActive"
+                                                        class="form-select form-select-sm">
+
+                                                    <option value="true"
+                                                            ${sku.active ? 'selected' : ''}>
+                                                        Đang bán
+                                                    </option>
+
+                                                    <option value="false"
+                                                            ${not sku.active ? 'selected' : ''}>
+                                                        Ngừng bán
+                                                    </option>
+
+                                                </select>
+                                            </td>
+
+                                        </tr>
+
+                                    </c:forEach>
 
                                 </tbody>
 
                             </table>
                         </div>
 
-                        <!-- ======================= -->
-                        <!-- NÚT XÁC NHẬN          -->
-                        <!-- ======================= -->
+                        <%-- =========================
+                             6.2. NÚT XÁC NHẬN
+                             ========================= --%>
 
                         <div class="p-4 border-top">
 
@@ -731,8 +749,8 @@
 
                                     <i class="bi bi-shield-check me-1"></i>
 
-                                    Tất cả SKU sẽ được lưu trong
-                                    một transaction SQL.
+                                    Tất cả SKU sẽ được lưu
+                                    trong một transaction SQL.
                                 </div>
 
                                 <button type="submit"
@@ -743,8 +761,8 @@
                                     Xác Nhận Lưu
                                     ${fn:length(previewSkuList)} SKU
                                 </button>
-                            </div>
 
+                            </div>
                         </div>
 
                     </form>
@@ -752,7 +770,9 @@
                 </div>
             </div>
 
-            <!-- FORM XÓA BẢN XEM TRƯỚC -->
+            <%-- =====================================
+                 6.3. XÓA BẢN XEM TRƯỚC
+                 ===================================== --%>
 
             <form action="${pageContext.request.contextPath}/sku-bulk"
                   method="POST"
@@ -772,6 +792,7 @@
 
                     <i class="bi bi-trash me-1"></i>
                     Xóa Bản Xem Trước
+
                 </button>
             </form>
 
@@ -780,17 +801,20 @@
     </div>
 </div>
 
+<%-- =========================================
+     7. JAVASCRIPT
+     ========================================= --%>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        // ========================================
-        // 1. FORMAT GIÁ VNĐ
-        // ========================================
+        // =====================================
+        // 7.1. FORMAT GIÁ VNĐ
+        // =====================================
 
         function formatMoney(input) {
 
-            const digits =
-                    input.value.replace(/\D/g, "");
+            const digits = input.value.replace(/\D/g, "");
 
             if (digits === "") {
                 input.value = "";
@@ -813,26 +837,15 @@
                     });
                 });
 
-        // ========================================
-        // 2. ĐẾM SỐ TỔ HỢP DỰ KIẾN
-        // ========================================
-
-        const estimatedElement =
-                document.getElementById(
-                        "estimatedCombinations"
-                        );
-
-        const previewForm =
-                document.getElementById(
-                        "bulkPreviewForm"
-                        );
+        // =====================================
+        // 7.2. ĐỌC GIÁ TRỊ TỪ MỘT THUỘC TÍNH
+        // =====================================
 
         function getDimensionValues(name) {
 
-            const inputs =
-                    document.querySelectorAll(
-                            '[name="' + name + '"]'
-                            );
+            const inputs = document.querySelectorAll(
+                    '[name="' + name + '"]'
+                    );
 
             const values = [];
 
@@ -846,7 +859,9 @@
 
                 } else {
 
-                    input.value.split(/[,\\r\\n]+/)
+                    // Sửa regex:
+                    // Tách theo dấu phẩy hoặc xuống dòng.
+                    input.value.split(/[,\r\n]+/)
                             .forEach(function (value) {
 
                                 value = value.trim();
@@ -861,29 +876,35 @@
             return Array.from(new Set(values));
         }
 
+        // =====================================
+        // 7.3. TÍNH SỐ TỔ HỢP
+        // =====================================
+
+        const estimatedElement =
+                document.getElementById("estimatedCombinations");
+
+        const previewForm =
+                document.getElementById("bulkPreviewForm");
+
         function calculateCombinations() {
 
             if (!estimatedElement || !previewForm) {
                 return 0;
             }
 
-            const dimensionNames =
-                    new Set();
+            const dimensionNames = new Set();
 
-            previewForm.querySelectorAll(
-                    '[name^="option_"]'
-                    ).forEach(function (input) {
-
-                dimensionNames.add(input.name);
-            });
+            previewForm.querySelectorAll('[name^="option_"]')
+                    .forEach(function (input) {
+                        dimensionNames.add(input.name);
+                    });
 
             let total = 1;
             let selectedDimensions = 0;
 
             dimensionNames.forEach(function (name) {
 
-                const values =
-                        getDimensionValues(name);
+                const values = getDimensionValues(name);
 
                 if (values.length > 0) {
 
@@ -902,201 +923,169 @@
 
             if (total > 200) {
 
-                estimatedElement.classList.add(
-                        "text-danger"
-                        );
-
-                estimatedElement.classList.remove(
-                        "text-primary"
-                        );
+                estimatedElement.classList.add("text-danger");
+                estimatedElement.classList.remove("text-primary");
 
             } else {
 
-                estimatedElement.classList.add(
-                        "text-primary"
-                        );
-
-                estimatedElement.classList.remove(
-                        "text-danger"
-                        );
+                estimatedElement.classList.add("text-primary");
+                estimatedElement.classList.remove("text-danger");
             }
 
             return total;
         }
 
+        // =====================================
+        // 7.4. VALIDATE FORM PREVIEW
+        // =====================================
+
         if (previewForm) {
 
-            previewForm.querySelectorAll(
-                    '[name^="option_"]'
-                    ).forEach(function (input) {
+            previewForm.querySelectorAll('[name^="option_"]')
+                    .forEach(function (input) {
 
-                input.addEventListener(
-                        "input",
-                        calculateCombinations
-                        );
+                        input.addEventListener(
+                                "input",
+                                calculateCombinations
+                                );
 
-                input.addEventListener(
-                        "change",
-                        calculateCombinations
-                        );
-            });
+                        input.addEventListener(
+                                "change",
+                                calculateCombinations
+                                );
+                    });
 
             calculateCombinations();
 
-            // ====================================
-            // 3. VALIDATE FORM PREVIEW
-            // ====================================
+            previewForm.addEventListener("submit", function (event) {
 
-            previewForm.addEventListener(
-                    "submit",
-                    function (event) {
+                const total = calculateCombinations();
 
-                        const total =
-                                calculateCombinations();
+                if (total === 0) {
 
-                        if (total === 0) {
+                    event.preventDefault();
 
-                            event.preventDefault();
+                    alert(
+                            "Vui lòng nhập ít nhất một giá trị biến thể."
+                            );
 
-                            alert(
-                                    "Vui lòng nhập ít nhất một "
-                                    + "giá trị biến thể."
-                                    );
+                    return;
+                }
 
-                            return;
-                        }
+                if (total > 200) {
 
-                        if (total > 200) {
+                    event.preventDefault();
 
-                            event.preventDefault();
+                    alert(
+                            "Số tổ hợp vượt quá 200 SKU. "
+                            + "Hãy giảm số lượng giá trị."
+                            );
 
-                            alert(
-                                    "Số tổ hợp vượt quá 200 SKU. "
-                                    + "Hãy giảm số lượng giá trị."
-                                    );
+                    return;
+                }
 
-                            return;
-                        }
+                // Backend tiếp tục kiểm tra
+                // kiểu dữ liệu và thuộc tính bắt buộc.
 
-                        /*
-                         * Backend vẫn kiểm tra bắt buộc
-                         * và kiểu dữ liệu theo
-                         * CATEGORY_ATTRIBUTE.
-                         */
+                if (!previewForm.checkValidity()) {
+                    return;
+                }
 
-                        if (!previewForm.checkValidity()) {
-                            return;
-                        }
+                const button =
+                        document.getElementById("generatePreviewBtn");
 
-                        const button =
-                                document.getElementById(
-                                        "generatePreviewBtn"
-                                        );
+                if (button) {
 
-                        if (button) {
-                            button.disabled = true;
-                            button.textContent =
-                                    "Đang tạo bản xem trước...";
-                        }
-                    });
+                    button.disabled = true;
+
+                    button.textContent =
+                            "Đang tạo bản xem trước...";
+                }
+            });
         }
 
-        // ========================================
-        // 4. KIỂM TRA FORM XÁC NHẬN
-        // ========================================
+        // =====================================
+        // 7.5. FORM XÁC NHẬN LƯU SKU
+        // =====================================
 
         const commitForm =
-                document.getElementById(
-                        "bulkCommitForm"
-                        );
+                document.getElementById("bulkCommitForm");
 
         if (commitForm) {
 
-            commitForm.addEventListener(
-                    "submit",
-                    function (event) {
+            commitForm.addEventListener("submit", function (event) {
 
-                        const skuInputs =
-                                commitForm.querySelectorAll(
-                                        ".sku-code-input"
-                                        );
+                const skuInputs =
+                        commitForm.querySelectorAll(".sku-code-input");
 
-                        const usedCodes =
-                                new Set();
+                const usedCodes = new Set();
 
-                        for (const input of skuInputs) {
+                for (const input of skuInputs) {
 
-                            const code =
-                                    input.value.trim();
-                            if (code === "") {
+                    const code = input.value.trim();
+                    if (code === "") {
 
-                                event.preventDefault();
+                        event.preventDefault();
 
-                                alert(
-                                        "Mã SKU không được để trống."
-                                        );
+                        alert("Mã SKU không được để trống.");
 
-                                input.focus();
-                                return;
-                            }
+                        input.focus();
+                        return;
+                    }
 
-                            const normalized =
-                                    code.toUpperCase();
+                    const normalized = code.toUpperCase();
 
-                            if (usedCodes.has(normalized)) {
+                    if (usedCodes.has(normalized)) {
 
-                                event.preventDefault();
+                        event.preventDefault();
 
-                                alert(
-                                        "Mã SKU bị trùng trong "
-                                        + "danh sách: " + code
-                                        );
-
-                                input.focus();
-                                return;
-                            }
-
-                            usedCodes.add(normalized);
-                        }
-
-                        if (!commitForm.checkValidity()) {
-                            return;
-                        }
-
-                        const confirmed = confirm(
-                                "Xác nhận lưu "
-                                + skuInputs.length
-                                + " SKU vào hệ thống?"
+                        alert(
+                                "Mã SKU bị trùng trong danh sách: "
+                                + code
                                 );
 
-                        if (!confirmed) {
+                        input.focus();
+                        return;
+                    }
 
-                            event.preventDefault();
-                            return;
-                        }
+                    usedCodes.add(normalized);
+                }
 
-                        const button =
-                                document.getElementById(
-                                        "commitBulkBtn"
-                                        );
+                if (!commitForm.checkValidity()) {
+                    return;
+                }
 
-                        if (button) {
+                const confirmed = confirm(
+                        "Xác nhận lưu "
+                        + skuInputs.length
+                        + " SKU vào hệ thống?"
+                        );
 
-                            button.disabled = true;
-                            button.textContent =
-                                    "Đang lưu SKU...";
-                        }
-                    });
+                if (!confirmed) {
+
+                    event.preventDefault();
+                    return;
+                }
+
+                const button =
+                        document.getElementById("commitBulkBtn");
+
+                if (button) {
+
+                    button.disabled = true;
+
+                    button.textContent =
+                            "Đang lưu SKU...";
+                }
+            });
         }
 
-        // ========================================
-        // 5. CUỘN ĐẾN PREVIEW KHI CÓ KẾT QUẢ
-        // ========================================
+        // =====================================
+        // 7.6. CUỘN ĐẾN PREVIEW
+        // =====================================
 
         const previewSection =
-                document.getElementById(
-                        "previewSection"
-                        );
+                document.getElementById("previewSection");
 
         if (previewSection
                 && window.location.hash === "#preview") {
@@ -1106,6 +1095,7 @@
                 block: "start"
             });
         }
+
     });
 </script>
 

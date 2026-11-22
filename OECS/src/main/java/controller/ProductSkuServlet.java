@@ -11,6 +11,12 @@ import model.ProductSku;
 import model.SkuAttributeValue;
 import model.User;
 
+import dao.SkuHardDeleteDAO;
+
+import jakarta.servlet.http.HttpSession;
+
+import java.util.UUID;
+
 import service.AuditLogService;
 import service.SkuImageService;
 
@@ -152,6 +158,15 @@ public class ProductSkuServlet extends HttpServlet {
                 skuImagesBySkuId
         );
 
+        // Token xác nhận xóa vĩnh viễn SKU (giữ ổn định trong phiên).
+        HttpSession session = request.getSession();
+        if (session.getAttribute("skuHardDeleteToken") == null) {
+            session.setAttribute(
+                    "skuHardDeleteToken",
+                    UUID.randomUUID().toString()
+            );
+        }
+
         request.getRequestDispatcher(
                 "/WEB-INF/sku/list.jsp"
         ).forward(request, response);
@@ -203,6 +218,10 @@ public class ProductSkuServlet extends HttpServlet {
 
                 case "delete":
                     deactivateSku(request, product);
+                    break;
+
+                case "hardDelete":
+                    hardDeleteSku(request, product);
                     break;
 
                 default:
@@ -445,6 +464,56 @@ public class ProductSkuServlet extends HttpServlet {
                 skuId.longValue(),
                 "Updated SKU: " + updated.getSkuCode()
         );
+    }
+
+    // ========================================
+    // 5A. XÓA VĨNH VIỄN SKU CHƯA CÓ GIAO DỊCH
+    // ========================================
+    private void hardDeleteSku(
+            HttpServletRequest request,
+            Product product) throws SQLException {
+
+        // Token kiểm tra phải được tạo từ trang GET quản lý SKU.
+        HttpSession session = request.getSession(false);
+        String expectedToken = session == null
+                ? null
+                : (String) session.getAttribute("skuHardDeleteToken");
+        String submittedToken = request.getParameter("deleteToken");
+
+        if (expectedToken == null
+                || submittedToken == null
+                || !expectedToken.equals(submittedToken)) {
+            throw new IllegalArgumentException(
+                    "Phiên xác nhận xóa không hợp lệ. Vui lòng tải lại trang."
+            );
+        }
+
+        Integer skuId = parsePositiveInt(request.getParameter("skuId"));
+        if (skuId == null) {
+            throw new IllegalArgumentException("SKU ID không hợp lệ.");
+        }
+
+        ProductSku existing = new ProductSkuDAO().getBySkuId(skuId);
+        if (existing == null
+                || existing.getProductId() != product.getProductId()) {
+            throw new IllegalArgumentException(
+                    "SKU không thuộc sản phẩm này."
+            );
+        }
+
+        String deletedCode = new SkuHardDeleteDAO().deletePermanently(
+                product.getProductId(), skuId
+        );
+
+        // Không xóa lịch sử audit: ghi nhận ID và mã SKU đã bị xóa.
+        writeAuditLog(
+                request,
+                "HARD_DELETE_SKU",
+                skuId.longValue(),
+                "Permanently deleted SKU: " + deletedCode
+        );
+
+        setSuccess(request, "Đã xóa vĩnh viễn SKU: " + deletedCode);
     }
 
     // ========================================

@@ -2,6 +2,7 @@ dao\InventoryDAO.class
 dao\CheckoutDAO.class
 dao\OrderDAO.class
 controller\CartServlet.class
+controller\ShopServlet$SpecGroupReader.class
 dao\CategoryDAO.class
 controller\ForgotPasswordServlet.class
 service\ProductCatalogService.class
@@ -51,6 +52,7 @@ model\Role.class
 service\OrderService.class
 controller\StaffReviewServlet.class
 controller\NotificationServlet.class
+model\ProductOverviewSection.class
 dao\AdminReportDAO.class
 controller\LoginServlet.class
 controller\CheckoutServlet.class
@@ -76,6 +78,7 @@ model\InventoryMovement.class
 dao\UserDAO.class
 model\Voucher.class
 dao\AddressDAO.class
+dao\SkuHardDeleteDAO.class
 model\ProductImage.class
 dao\PaymentDAO$LockedOrder.class
 model\Notification.class
