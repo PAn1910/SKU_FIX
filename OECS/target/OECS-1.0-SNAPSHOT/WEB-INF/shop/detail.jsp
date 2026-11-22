@@ -204,6 +204,133 @@
         margin-top: 4px;
     }
 
+    /* ========================================
+       SKU VARIANT GROUPS - OECS V2
+       Tao nut theo ATTRIBUTE, nhung luon chon SKU thuc co
+       ======================================== */
+    .variant-selector[hidden],
+    #skuFallback[hidden] {
+        display: none !important;
+    }
+
+    .variant-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .variant-group {
+        display: grid;
+        grid-template-columns: 126px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+    }
+
+    .variant-group-title {
+        margin: 10px 0 0;
+        color: #475569;
+        font-weight: 650;
+        font-size: 14px;
+    }
+
+    .variant-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .variant-option {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 49px;
+        padding: 10px 15px;
+        border: 1.5px solid #d1d5db;
+        background: #fff;
+        color: #172033;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 650;
+        line-height: 1.35;
+        transition: background .18s ease, border-color .18s ease;
+    }
+
+    .variant-option:hover:not(:disabled) {
+        border-color: #93c5fd;
+        background: #f8fbff;
+    }
+
+    .variant-option[aria-pressed="true"] {
+        border-color: #2563eb;
+        background: #eff6ff;
+        color: #1d4ed8;
+        box-shadow: inset 0 0 0 1px #2563eb;
+    }
+
+    .variant-option:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 3px;
+    }
+
+    .variant-option:disabled {
+        opacity: .45;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
+
+    .variant-color-thumb {
+        display: block;
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .variant-color-dot {
+        display: inline-block;
+        flex: 0 0 auto;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1px solid rgba(15, 23, 42, .18);
+    }
+
+    .variant-selection-summary {
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .variant-selection-summary strong {
+        color: #1e293b;
+        font-weight: 650;
+    }
+
+    .variant-change-notice {
+        margin: -8px 0 16px;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    @media (max-width: 575.98px) {
+        .variant-group {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .variant-group-title {
+            margin-top: 0;
+        }
+
+        .variant-option {
+            min-height: 44px;
+            padding: 9px 12px;
+        }
+    }
+
     .purchase-button {
         min-height: 54px;
         border-radius: 12px;
@@ -311,9 +438,9 @@
 <div class="detail-page">
     <div class="container">
 
-        <!-- ======================================== -->
-        <!-- 1. BREADCRUMB                          -->
-        <!-- ======================================== -->
+        <%-- ======================================== --%>
+        <%-- 1. BREADCRUMB                          --%>
+        <%-- ======================================== --%>
 
         <nav aria-label="breadcrumb"
              class="detail-breadcrumb mb-4">
@@ -341,15 +468,15 @@
             </ol>
         </nav>
 
-        <!-- ======================================== -->
-        <!-- 2. THÔNG TIN SẢN PHẨM                   -->
-        <!-- ======================================== -->
+        <%-- ======================================== --%>
+        <%-- 2. THÔNG TIN SẢN PHẨM                   --%>
+        <%-- ======================================== --%>
 
         <div class="row g-4 g-lg-5 mb-5">
 
-            <!-- ==================================== -->
-            <!-- 2.1. THƯ VIỆN ẢNH                  -->
-            <!-- ==================================== -->
+            <%-- ==================================== --%>
+            <%-- 2.1. THƯ VIỆN ẢNH                  --%>
+            <%-- ==================================== --%>
 
             <div class="col-lg-5">
 
@@ -384,9 +511,9 @@
 
             </div>
 
-            <!-- ==================================== -->
-            <!-- 2.2. THÔNG TIN VÀ MUA HÀNG         -->
-            <!-- ==================================== -->
+            <%-- ==================================== --%>
+            <%-- 2.2. THÔNG TIN VÀ MUA HÀNG         --%>
+            <%-- ==================================== --%>
 
             <div class="col-lg-7">
 
@@ -456,9 +583,9 @@
 
                 </div>
 
-                <!-- ================================ -->
-                <!-- GIÁ VÀ TỒN KHO                 -->
-                <!-- ================================ -->
+                <%-- ================================ --%>
+                <%-- GIÁ VÀ TỒN KHO                 --%>
+                <%-- ================================ --%>
 
                 <div class="product-price-panel mb-4">
 
@@ -543,9 +670,9 @@
 
                 </div>
 
-                <!-- ================================ -->
-                <!-- FORM THÊM GIỎ HÀNG             -->
-                <!-- ================================ -->
+                <%-- ================================ --%>
+                <%-- FORM THÊM GIỎ HÀNG             --%>
+                <%-- ================================ --%>
 
                 <form id="addToCartForm"
                       action="${pageContext.request.contextPath}/cart"
@@ -576,7 +703,20 @@
 
                             </div>
 
-                            <div class="row g-2 mb-4">
+                            <%-- UI nhóm biến thể được JS dựng từ thuộc tính SKU thực tế. --%>
+                            <div id="skuVariantGroups"
+                                 class="variant-selector mb-3"
+                                 aria-label="Chọn cấu hình và màu sắc"
+                                 hidden></div>
+
+                            <p id="skuVariantNotice"
+                               class="variant-change-notice"
+                               role="status"
+                               aria-live="polite"
+                               hidden></p>
+
+                            <%-- Fallback khi không có JS hoặc thuộc tính SKU không đồng nhất. --%>
+                            <div id="skuFallback" class="row g-2 mb-4">
 
                                 <c:forEach items="${skus}"
                                            var="sku">
@@ -619,7 +759,9 @@
                                                                 </c:when>
 
                                                                 <c:when test="${attr.numericValue ne null}">
-                                                                    <c:out value="${attr.numericValue}"/>
+                                                                    <fmt:formatNumber value="${attr.numericValue}"
+                                                                                      pattern="0.####"
+                                                                                      groupingUsed="false"/><c:if test="${attr.attributeName eq 'Dung lượng lưu trữ' or attr.attributeName eq 'RAM'}">GB</c:if>
                                                                 </c:when>
 
                                                                 <c:when test="${attr.booleanValue ne null}">
@@ -700,6 +842,23 @@
 
                 </form>
 
+                <%-- Dữ liệu SKU cho bộ chọn biến thể động. Không tự sinh tổ hợp ảo. --%>
+                <div id="skuVariantData" hidden>
+                    <c:forEach items="${skus}" var="sku">
+                        <div class="sku-variant-record"
+                             data-sku-id="${sku.skuId}">
+                            <c:forEach items="${sku.attributeValues}" var="attr">
+                                <span class="sku-attribute-record"
+                                      data-attribute-id="${attr.attributeId}"
+                                      data-name="<c:out value='${attr.attributeName}'/>"
+                                      data-text="<c:out value='${attr.textValue}'/>"
+                                      data-number="<c:out value='${attr.numericValue}'/>"
+                                      data-boolean="<c:out value='${attr.booleanValue}'/>"></span>
+                            </c:forEach>
+                        </div>
+                    </c:forEach>
+                </div>
+
                 <div class="d-flex flex-wrap gap-3
                      text-muted small mt-4">
 
@@ -719,9 +878,9 @@
 
         </div>
 
-        <!-- ======================================== -->
-        <!-- 3. THÔNG SỐ KỸ THUẬT                    -->
-        <!-- ======================================== -->
+        <%-- ======================================== --%>
+        <%-- 3. THÔNG SỐ KỸ THUẬT                    --%>
+        <%-- ======================================== --%>
 
         <div class="row mt-5">
             <div class="col-12">
@@ -729,9 +888,9 @@
             </div>
         </div>
 
-        <!-- ======================================== -->
-        <!-- 4. MÔ TẢ SẢN PHẨM                       -->
-        <!-- ======================================== -->
+        <%-- ======================================== --%>
+        <%-- 4. MÔ TẢ SẢN PHẨM                       --%>
+        <%-- ======================================== --%>
 
         <div class="row mt-5">
 
@@ -788,9 +947,9 @@
 
         </div>
 
-        <!-- ======================================== -->
-        <!-- 5. ĐÁNH GIÁ VÀ BÌNH LUẬN                 -->
-        <!-- ======================================== -->
+        <%-- ======================================== --%>
+        <%-- 5. ĐÁNH GIÁ VÀ BÌNH LUẬN                 --%>
+        <%-- ======================================== --%>
 
         <div class="row mt-5">
 
@@ -862,9 +1021,9 @@
 
                 </div>
 
-                <!-- ================================ -->
-                <!-- THÔNG BÁO BÁO CÁO ĐÁNH GIÁ      -->
-                <!-- ================================ -->
+                <%-- ================================ --%>
+                <%-- THÔNG BÁO BÁO CÁO ĐÁNH GIÁ      --%>
+                <%-- ================================ --%>
 
                 <c:choose>
 
@@ -931,9 +1090,9 @@
 
                 </c:choose>
 
-                <!-- ================================ -->
-                <!-- DANH SÁCH ĐÁNH GIÁ             -->
-                <!-- ================================ -->
+                <%-- ================================ --%>
+                <%-- DANH SÁCH ĐÁNH GIÁ             --%>
+                <%-- ================================ --%>
 
                 <c:choose>
 
@@ -1002,7 +1161,7 @@
                                     <c:out value="${review.comment}"/>
                                 </p>
 
-                                <!-- ẢNH ĐÁNH GIÁ -->
+                                <%-- ẢNH ĐÁNH GIÁ --%>
 
                                 <c:if test="${not empty review.images}">
 
@@ -1023,7 +1182,7 @@
 
                                 </c:if>
 
-                                <!-- BÁO CÁO ĐÁNH GIÁ -->
+                                <%-- BÁO CÁO ĐÁNH GIÁ --%>
 
                                 <c:if test="${sessionScope.loggedInUser.customer
                                               and sessionScope.loggedInUser.userId ne review.userId}">
@@ -1098,9 +1257,9 @@
 
         </div>
 
-        <!-- ======================================== -->
-        <!-- 6. SẢN PHẨM TƯƠNG TỰ - OECS V2           -->
-        <!-- ======================================== -->
+        <%-- ======================================== --%>
+        <%-- 6. SẢN PHẨM TƯƠNG TỰ - OECS V2           --%>
+        <%-- ======================================== --%>
 
         <c:if test="${not empty relatedProducts}">
 
@@ -1255,7 +1414,7 @@
             <section class="related-section"
                      id="relatedProducts">
 
-                <!-- HEADER -->
+                <%-- HEADER --%>
 
                 <div class="related-section-header">
 
@@ -1282,7 +1441,7 @@
 
                     </div>
 
-                    <!-- XEM THÊM THEO DANH MỤC -->
+                    <%-- XEM THÊM THEO DANH MỤC --%>
 
                     <c:url var="categoryUrl" value="/shop">
                         <c:param name="categoryId"
@@ -1300,7 +1459,7 @@
 
                 </div>
 
-                <!-- DANH SÁCH SẢN PHẨM -->
+                <%-- DANH SÁCH SẢN PHẨM --%>
 
                 <div class="row g-3 g-lg-4">
 
@@ -1312,7 +1471,7 @@
 
                             <div class="col-6 col-lg-3">
 
-                                <!-- LINK CHI TIẾT -->
+                                <%-- LINK CHI TIẾT --%>
 
                                 <c:url var="relatedUrl" value="/shop">
                                     <c:param name="action" value="detail"/>
@@ -1320,7 +1479,7 @@
                                              value="${related.productId}"/>
                                 </c:url>
 
-                                <!-- LINK ẢNH -->
+                                <%-- LINK ẢNH --%>
 
                                 <c:set var="relatedImageUrl" value=""/>
 
@@ -1355,12 +1514,12 @@
 
                                 </c:if>
 
-                                <!-- CARD -->
+                                <%-- CARD --%>
 
                                 <a class="related-card"
                                    href="${fn:escapeXml(relatedUrl)}">
 
-                                    <!-- IMAGE -->
+                                    <%-- IMAGE --%>
 
                                     <div class="related-card-image">
 
@@ -1385,7 +1544,7 @@
 
                                     </div>
 
-                                    <!-- BODY -->
+                                    <%-- BODY --%>
 
                                     <div class="related-card-body">
 
@@ -1463,11 +1622,11 @@
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- 6. DỮ LIỆU ẢNH DÀNH CHO JAVASCRIPT           -->
-<!-- ============================================ -->
+<%-- ============================================ --%>
+<%-- 6. DỮ LIỆU ẢNH DÀNH CHO JAVASCRIPT           --%>
+<%-- ============================================ --%>
 
-<!-- Gallery chung của Product -->
+<%-- Gallery chung của Product --%>
 <div id="productGalleryData" hidden>
 
     <c:if test="${not empty product.imageUrl}">
@@ -1491,7 +1650,7 @@
 
 </div>
 
-<!-- Gallery riêng từng SKU -->
+<%-- Gallery riêng từng SKU --%>
 <div id="skuGalleryData" hidden>
 
     <c:forEach items="${skus}" var="sku">
@@ -1524,7 +1683,6 @@
 
         const mainImage =
                 document.getElementById("mainProductImage");
-
         const galleryPlaceholder =
                 document.getElementById("galleryPlaceholder");
 
@@ -1967,10 +2125,14 @@
         const selectedRadio =
                 document.querySelector(
                         ".sku-radio:checked:not(:disabled)"
-                        );
+                        )
+                || Array.from(skuRadios).find(function (radio) {
+            return !radio.disabled && Number(radio.dataset.stock) > 0;
+        });
 
         if (selectedRadio) {
 
+            selectedRadio.checked = true;
             updateSkuInfo(selectedRadio);
 
             updateSkuGallery(
@@ -2011,7 +2173,342 @@
         }
 
         // ========================================
-        // 12. BẢO VỆ FORM GIỎ HÀNG
+        // 12. CHỌN SKU THEO NHÓM THUỘC TÍNH
+        // Dùng SKU thật làm nguồn dữ liệu duy nhất.
+        // Nếu thuộc tính không đồng nhất -> giữ radio dự phòng.
+        // ========================================
+
+        function setupGroupedSkuSelector() {
+            const container = document.getElementById("skuVariantGroups");
+            const fallback = document.getElementById("skuFallback");
+            const dataBox = document.getElementById("skuVariantData");
+            const notice = document.getElementById("skuVariantNotice");
+
+            if (!container || !fallback || !dataBox || !skuRadios.length) {
+                return;
+            }
+
+            function foldText(value) {
+                return String(value || "").trim().normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .replace(/đ/g, "d").replace(/Đ/g, "D")
+                        .toLowerCase().replace(/\s+/g, " ");
+            }
+
+            function simpleNumber(raw) {
+                const value = Number(String(raw).trim().replace(",", "."));
+                if (!Number.isFinite(value)) {
+                    return null;
+                }
+                return String(value);
+            }
+
+            function getAttributeValue(node) {
+                const name = node.dataset.name || ("Thuộc tính " + node.dataset.attributeId);
+                const foldedName = foldText(name);
+                const isGb = foldedName === "ram"
+                        || foldedName.includes("dung luong luu tru")
+                        || foldedName.includes("bo nho trong");
+                const text = String(node.dataset.text || "").trim();
+                const numberText = String(node.dataset.number || "").trim();
+                const booleanText = String(node.dataset.boolean || "").trim();
+
+                if (text) {
+                    if (isGb) {
+                        const memory = text.match(/^(\d+(?:[.,]\d+)?)\s*(GB|TB)$/i);
+                        if (memory) {
+                            const num = simpleNumber(memory[1]);
+                            const unit = memory[2].toUpperCase();
+                            if (num !== null) {
+                                return {key: num + unit, label: num + unit};
+                            }
+                        }
+                    }
+                    return {key: "t:" + foldText(text), label: text};
+                }
+                if (numberText) {
+                    const num = simpleNumber(numberText);
+                    if (num === null) {
+                        return null;
+                    }
+                    if (isGb) {
+                        return {key: num + "GB", label: num + "GB"};
+                    }
+                    return {key: "n:" + num, label: num};
+                }
+                if (booleanText) {
+                    const isTrue = booleanText.toLowerCase() === "true"
+                            || booleanText === "1";
+                    return {key: "b:" + isTrue, label: isTrue ? "Có" : "Không"};
+                }
+                return null;
+            }
+
+            const radioById = new Map();
+            skuRadios.forEach(function (radio) {
+                radioById.set(radio.value, radio);
+            });
+
+            const variants = [];
+            let invalidData = false;
+            dataBox.querySelectorAll(".sku-variant-record").forEach(function (node) {
+                const radio = radioById.get(node.dataset.skuId);
+                if (!radio) {
+                    invalidData = true;
+                    return;
+                }
+                const attrs = new Map();
+                node.querySelectorAll(".sku-attribute-record").forEach(function (attr) {
+                    const id = String(attr.dataset.attributeId || "");
+                    const parsed = getAttributeValue(attr);
+                    if (!id || !parsed || attrs.has(id)) {
+                        invalidData = true;
+                        return;
+                    }
+                    attrs.set(id, {
+                        id: id,
+                        name: attr.dataset.name || ("Thuộc tính " + id),
+                        key: parsed.key,
+                        label: parsed.label
+                    });
+                });
+                variants.push({
+                    id: node.dataset.skuId,
+                    radio: radio,
+                    stock: Number(radio.dataset.stock) || 0,
+                    attrs: attrs
+                });
+            });
+
+            // Không hiện nhóm nếu SKU không có thuộc tính, thiếu thuộc tính,
+            // hoặc có nhiều SKU cùng một tổ hợp (không xác định SKU nào).
+            if (invalidData || variants.length !== skuRadios.length || !variants.length
+                    || variants.some(function (v) {
+                        return v.attrs.size === 0;
+                    })) {
+                return;
+            }
+
+            const ids = Array.from(variants[0].attrs.keys());
+            if (variants.some(function (v) {
+                return v.attrs.size !== ids.length
+                        || ids.some(function (id) {
+                            return !v.attrs.has(id);
+                        });
+            })) {
+                return;
+            }
+
+            const signatures = new Set();
+            for (const variant of variants) {
+                const signature = ids.map(function (id) {
+                    return id + ":" + variant.attrs.get(id).key;
+                }).join("|");
+                if (signatures.has(signature)) {
+                    return;
+                }
+                signatures.add(signature);
+            }
+
+            function priority(id) {
+                const name = foldText(variants[0].attrs.get(id).name);
+                if (name.includes("dung luong") || name === "ram") {
+                    return 1;
+                }
+                if (name.includes("ssd") || name.includes("o cung")) {
+                    return 2;
+                }
+                if (name.includes("kich thuoc") || name.includes("phien ban")) {
+                    return 3;
+                }
+                if (name.includes("mau sac")) {
+                    return 20;
+                }
+                return 10;
+            }
+            ids.sort(function (a, b) {
+                return priority(a) - priority(b);
+            });
+
+            function displayName(id) {
+                const raw = variants[0].attrs.get(id).name;
+                const name = foldText(raw);
+                if (name === "dung luong luu tru") {
+                    return "Dung lượng";
+                }
+                return raw;
+            }
+
+            const swatches = {
+                "den": "#24252a", "bac": "#c9cdd1", "trang": "#f5f5f3",
+                "xam": "#8c919b", "xanh": "#3283bd", "xanh duong": "#3283bd",
+                "xanh la": "#49966e", "do": "#be4850", "vang": "#e2c36e",
+                "hong": "#dfa5b4", "tim": "#9277b6", "nau": "#976f55",
+                "titan tu nhien": "#b2a99a", "titan sa mac": "#bd9b7e"
+            };
+
+            const buttons = [];
+            ids.forEach(function (id) {
+                const group = document.createElement("div");
+                group.className = "variant-group";
+
+                const label = document.createElement("div");
+                label.className = "variant-group-title";
+                label.textContent = displayName(id);
+                group.appendChild(label);
+
+                const optionsBox = document.createElement("div");
+                optionsBox.className = "variant-options";
+                optionsBox.setAttribute("role", "group");
+                optionsBox.setAttribute("aria-label", displayName(id));
+
+                const seen = new Set();
+                variants.forEach(function (variant) {
+                    const attr = variant.attrs.get(id);
+                    if (seen.has(attr.key)) {
+                        return;
+                    }
+                    seen.add(attr.key);
+                    const matching = variants.filter(function (item) {
+                        return item.attrs.get(id).key === attr.key;
+                    });
+                    const available = matching.some(function (item) {
+                        return item.stock > 0;
+                    });
+
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "variant-option";
+                    button.dataset.attributeId = id;
+                    button.dataset.valueKey = attr.key;
+                    button.disabled = !available;
+                    button.setAttribute("aria-pressed", "false");
+                    button.title = available ? "Chọn " + attr.label : "Hết hàng";
+
+                    if (foldText(displayName(id)).includes("mau sac")) {
+                        // Chỉ dùng ảnh thực sự gắn với một SKU mang màu này.
+                        const withImage = matching.find(function (item) {
+                            const photos = skuGalleries.get(item.id) || [];
+                            return photos.length > 0;
+                        });
+                        const color = swatches[foldText(attr.label)];
+                        const dot = document.createElement("span");
+                        dot.className = "variant-color-dot";
+                        dot.style.backgroundColor = color || "#e2e8f0";
+                        dot.setAttribute("aria-hidden", "true");
+                        if (withImage) {
+                            const photo = skuGalleries.get(withImage.id)[0];
+                            const thumb = document.createElement("img");
+                            thumb.className = "variant-color-thumb";
+                            thumb.src = photo.url;
+                            thumb.alt = "";
+                            thumb.loading = "lazy";
+                            thumb.addEventListener("error", function () {
+                                thumb.replaceWith(dot);
+                            });
+                            button.appendChild(thumb);
+                        } else if (color) {
+                            button.appendChild(dot);
+                        }
+                    }
+                    const caption = document.createElement("span");
+                    caption.textContent = attr.label;
+                    button.appendChild(caption);
+
+                    if (!available) {
+                        const soldOut = document.createElement("small");
+                        soldOut.textContent = "(Hết hàng)";
+                        button.appendChild(soldOut);
+                    }
+
+                    button.addEventListener("click", function () {
+                        const current = variants.find(function (item) {
+                            return item.radio.checked;
+                        }) || variants[0];
+                        const candidates = matching.filter(function (item) {
+                            return item.stock > 0;
+                        });
+                        if (!candidates.length) {
+                            return;
+                        }
+
+                        // Ưu tiên giữ các lựa chọn khác; nếu không có tổ hợp đó,
+                        // chuyển tới một SKU thực sự tồn tại và còn hàng.
+                        function score(item) {
+                            return ids.reduce(function (total, otherId) {
+                                return total + (otherId !== id
+                                        && item.attrs.get(otherId).key === current.attrs.get(otherId).key
+                                        ? 1 : 0);
+                            }, 0);
+                        }
+                        candidates.sort(function (a, b) {
+                            return score(b) - score(a);
+                        });
+                        const chosen = candidates[0];
+                        const changedOthers = ids.some(function (otherId) {
+                            return otherId !== id
+                                    && current.attrs.get(otherId).key !== chosen.attrs.get(otherId).key;
+                        });
+
+                        chosen.radio.checked = true;
+                        chosen.radio.dispatchEvent(new Event("change", {bubbles: true}));
+                        updateButtonState();
+
+                        if (notice) {
+                            notice.hidden = !changedOthers;
+                            notice.textContent = changedOthers
+                                    ? "Hệ thống đã chọn tổ hợp có sẵn: "
+                                    + ids.map(function (otherId) {
+                                        return chosen.attrs.get(otherId).label;
+                                    }).join(" · ")
+                                    : "";
+                        }
+                    });
+                    optionsBox.appendChild(button);
+                    buttons.push(button);
+                });
+                group.appendChild(optionsBox);
+                container.appendChild(group);
+            });
+
+            const summary = document.createElement("p");
+            summary.className = "variant-selection-summary mb-0";
+            container.appendChild(summary);
+
+            function updateButtonState() {
+                const current = variants.find(function (v) {
+                    return v.radio.checked;
+                }) || variants[0];
+                buttons.forEach(function (button) {
+                    const selected = current.attrs.get(button.dataset.attributeId).key
+                            === button.dataset.valueKey;
+                    button.setAttribute("aria-pressed", String(selected));
+                });
+                summary.replaceChildren();
+                const label = document.createElement("span");
+                label.textContent = "Phiên bản: ";
+                const strong = document.createElement("strong");
+                strong.textContent = ids.map(function (id) {
+                    return current.attrs.get(id).label;
+                }).join(" · ");
+                summary.appendChild(label);
+                summary.appendChild(strong);
+            }
+
+            skuRadios.forEach(function (radio) {
+                radio.addEventListener("change", updateButtonState);
+            });
+
+            // Chỉ ẩn radio dự phòng khi UI nhóm đã dựng hoàn chỉnh.
+            fallback.hidden = true;
+            container.hidden = false;
+            updateButtonState();
+        }
+
+        setupGroupedSkuSelector();
+
+        // ========================================
+        // 13. BẢO VỆ FORM GIỎ HÀNG
         // ========================================
 
         if (addToCartForm) {
